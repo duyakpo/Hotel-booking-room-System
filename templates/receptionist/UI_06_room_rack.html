@@ -1,0 +1,682 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ đồ phòng theo tầng - Grand Horizon Hotel</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-navy: #163882;
+            --primary-navy-hover: #0f2861;
+            --status-available: #169354;
+            --status-occupied: #c83737;
+            --status-cleaning: #eab308;
+            --status-maintenance: #57606f;
+            --status-reserved: #1d4ed8;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #111827;
+            margin: 0;
+        }
+
+        /* ==================== HEADER LỄ TÂN ==================== */
+        .staff-navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 12px 0;
+        }
+        .brand-logo {
+            text-decoration: none;
+            display: inline-flex;
+            flex-direction: column;
+            line-height: 1;
+        }
+        .brand-logo .script-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.85rem;
+            color: var(--primary-navy);
+        }
+        .brand-logo .sub-name {
+            font-size: 0.58rem;
+            letter-spacing: 0.35em;
+            color: var(--primary-navy);
+            font-weight: 700;
+            margin-top: -2px;
+            padding-left: 2px;
+        }
+
+        .role-pill {
+            background-color: #eff6ff;
+            color: var(--primary-navy);
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .role-pill .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: var(--primary-navy);
+        }
+        .shift-info {
+            font-size: 0.82rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .notif-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #374151;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+        }
+        .notif-dot {
+            position: absolute;
+            top: 7px;
+            right: 8px;
+            width: 7px;
+            height: 7px;
+            background-color: #ef4444;
+            border-radius: 50%;
+        }
+        .staff-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* ==================== TIÊU ĐỀ & BỘ LỌC TRẠNG THÁI ==================== */
+        .page-header-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0 16px 0;
+        }
+        .page-main-title {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: #111827;
+            margin: 0;
+        }
+        .date-picker-btn {
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 0.85rem;
+            color: #374151;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .date-picker-btn input[type="date"] {
+            border: none;
+            font-weight: 700;
+            color: #111827;
+            font-size: 0.85rem;
+            outline: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .legend-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+        }
+        .legend-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 20px;
+            transition: background-color 0.2s;
+            user-select: none;
+        }
+        .legend-chip:hover,
+        .legend-chip.active {
+            background-color: #e2e8f0;
+        }
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .count-pill {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 1px 7px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* ==================== BẢNG SƠ ĐỒ PHÒNG THEO TẦNG ==================== */
+        .rack-container-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+        .floor-row {
+            display: flex;
+            align-items: stretch;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 18px 20px;
+        }
+        .floor-row:last-child {
+            border-bottom: none;
+        }
+        .floor-label-col {
+            width: 135px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 14px;
+        }
+        .floor-name {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #111827;
+        }
+        .floor-sub {
+            font-size: 0.78rem;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        .rooms-grid {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: repeat(10, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        /* Ô phòng từng phòng */
+        .room-tile-wrapper {
+            position: relative;
+        }
+        .room-tile {
+            border-radius: 8px;
+            padding: 10px 8px;
+            min-height: 76px;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+            border: 2px solid transparent;
+        }
+        .room-tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14);
+        }
+        .room-tile.selected-tile {
+            border-color: #111827;
+            box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.18);
+        }
+        .room-tile.dimmed {
+            opacity: 0.22;
+        }
+
+        .bg-available { background-color: var(--status-available); }
+        .bg-occupied { background-color: var(--status-occupied); }
+        .bg-cleaning { background-color: var(--status-cleaning); color: #1f2937; }
+        .bg-maintenance { background-color: var(--status-maintenance); }
+        .bg-reserved { background-color: var(--status-reserved); }
+
+        .room-code {
+            font-size: 0.85rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        .room-type-small {
+            font-size: 0.67rem;
+            font-weight: 500;
+            opacity: 0.92;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ==================== POPOVER THAO TÁC PHÒNG (GIỐNG P.203 TRÊN FIGMA) ==================== */
+        .room-popover {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 215px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+            z-index: 50;
+            display: none;
+        }
+        .room-popover.show {
+            display: block;
+        }
+        .room-popover::before {
+            content: "";
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 10px;
+            height: 10px;
+            background: #ffffff;
+            border-left: 1px solid #e5e7eb;
+            border-top: 1px solid #e5e7eb;
+        }
+        .popover-status-pill {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .pill-available { background: #dcfce7; color: #15803d; }
+        .pill-occupied { background: #fee2e2; color: #b91c1c; }
+        .pill-cleaning { background: #fef3c7; color: #b45309; }
+        .pill-maintenance { background: #f1f5f9; color: #475569; }
+        .pill-reserved { background: #dbeafe; color: #1d4ed8; }
+
+        .btn-popover-navy {
+            width: 100%;
+            background-color: var(--primary-navy);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            padding: 7px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+        .btn-popover-navy:hover {
+            background-color: var(--primary-navy-hover);
+            color: #ffffff;
+        }
+
+        @media (max-width: 1199px) {
+            .rooms-grid {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 767px) {
+            .floor-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .rooms-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- THANH HEADER DÀNH CHO LỄ TÂN -->
+    <header class="staff-navbar">
+        <div class="container-fluid px-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <!-- Trái: Logo + Vai trò Lễ tân + Ca làm việc -->
+                <div class="d-flex align-items-center gap-3">
+                    <a href="/" class="brand-logo">
+                        <span class="script-name">Grand Horizon</span>
+                        <span class="sub-name">HOTEL</span>
+                    </a>
+                    <span class="role-pill">
+                        <span class="dot"></span> Lễ tân
+                    </span>
+                    <span class="shift-info d-none d-md-inline">Ca sáng: 06:00 - 14:00</span>
+                </div>
+
+                <!-- Phải: Ngày hiện tại + Chuông thông báo + Tài khoản Lễ tân -->
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted small fw-medium d-none d-sm-inline">Thứ Tư, 19/11/2026</span>
+                    <button type="button" class="notif-btn" title="Thông báo">
+                        <i class="bi bi-bell"></i>
+                        <span class="notif-dot"></span>
+                    </button>
+                    <div class="dropdown">
+                        <div class="d-flex align-items-center gap-2" style="cursor: pointer;" data-bs-toggle="dropdown">
+                            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" alt="Nguyễn Vũ Duy" class="staff-avatar">
+                            <div class="lh-sm">
+                                <div class="fw-bold text-dark" style="font-size: 0.85rem;">Nguyễn Vũ Duy <i class="bi bi-chevron-down small text-muted"></i></div>
+                                <div class="text-muted" style="font-size: 0.72rem;">Lễ tân ca</div>
+                            </div>
+                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                            <li><a class="dropdown-item small" href="/"><i class="bi bi-house me-2"></i>Trang chủ khách sạn</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item small text-danger" href="/login/"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- NỘI DUNG CHÍNH SƠ ĐỒ PHÒNG -->
+    <main class="container-fluid px-4 pb-5">
+        <!-- Tiêu đề & Chọn ngày xem -->
+        <div class="page-header-row">
+            <h1 class="page-main-title">Sơ đồ phòng theo tầng</h1>
+            <div class="date-picker-btn">
+                <i class="bi bi-calendar3 text-muted"></i>
+                <span>Xem ngày:</span>
+                <input type="date" value="2026-11-09">
+            </div>
+        </div>
+
+        <!-- Thanh chú thích trạng thái phòng (Bấm vào để lọc) -->
+        <div class="legend-bar">
+            <div class="legend-items">
+                <div class="legend-chip" data-filter="available">
+                    <span class="status-dot" style="background-color: var(--status-available);"></span>
+                    <span>Trống</span>
+                    <span class="count-pill">13</span>
+                </div>
+                <div class="legend-chip" data-filter="occupied">
+                    <span class="status-dot" style="background-color: var(--status-occupied);"></span>
+                    <span>Có khách</span>
+                    <span class="count-pill">17</span>
+                </div>
+                <div class="legend-chip" data-filter="cleaning">
+                    <span class="status-dot" style="background-color: var(--status-cleaning);"></span>
+                    <span>Đang dọn</span>
+                    <span class="count-pill">4</span>
+                </div>
+                <div class="legend-chip" data-filter="maintenance">
+                    <span class="status-dot" style="background-color: var(--status-maintenance);"></span>
+                    <span>Bảo trì</span>
+                    <span class="count-pill">2</span>
+                </div>
+                <div class="legend-chip" data-filter="reserved">
+                    <span class="status-dot" style="background-color: var(--status-reserved);"></span>
+                    <span>Đã đặt trước</span>
+                    <span class="count-pill">4</span>
+                </div>
+            </div>
+            <div class="text-muted small fw-semibold">
+                40 phòng / 4 tầng
+            </div>
+        </div>
+
+        <!-- KHUNG LƯỚI SƠ ĐỒ 4 TẦNG -->
+        <div class="rack-container-card" id="roomRackBoard">
+            <!-- ==================== TẦNG 4 ==================== -->
+            <div class="floor-row">
+                <div class="floor-label-col">
+                    <div class="floor-name">Tầng 4</div>
+                    <div class="floor-sub">3 trống / 10 phòng</div>
+                </div>
+                <div class="rooms-grid">
+                    <div class="room-tile-wrapper"><div class="room-tile bg-available" data-room="P.401" data-type="Deluxe King" data-floor="Tầng 4" data-status="available"><div class="room-code">P.401</div><div class="room-type-small">Deluxe King</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.402" data-type="Junior Suite" data-floor="Tầng 4" data-status="occupied"><div class="room-code">P.402</div><div class="room-type-small">Junior Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.403" data-type="Suite" data-floor="Tầng 4" data-status="occupied"><div class="room-code">P.403</div><div class="room-type-small">Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-reserved" data-room="P.404" data-type="Junior Suite" data-floor="Tầng 4" data-status="reserved"><div class="room-code">P.404</div><div class="room-type-small">Junior Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-available" data-room="P.405" data-type="Deluxe King" data-floor="Tầng 4" data-status="available"><div class="room-code">P.405</div><div class="room-type-small">Deluxe King</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-cleaning" data-room="P.406" data-type="Suite" data-floor="Tầng 4" data-status="cleaning"><div class="room-code">P.406</div><div class="room-type-small">Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.407" data-type="Junior Suite" data-floor="Tầng 4" data-status="occupied"><div class="room-code">P.407</div><div class="room-type-small">Junior Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-available" data-room="P.408" data-type="Junior Suite" data-floor="Tầng 4" data-status="available"><div class="room-code">P.408</div><div class="room-type-small">Junior Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.409" data-type="Suite" data-floor="Tầng 4" data-status="occupied"><div class="room-code">P.409</div><div class="room-type-small">Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-maintenance" data-room="P.410" data-type="Junior Suite" data-floor="Tầng 4" data-status="maintenance"><div class="room-code">P.410</div><div class="room-type-small">Junior Suite</div></div></div>
+                </div>
+            </div>
+
+            <!-- ==================== TẦNG 3 ==================== -->
+            <div class="floor-row">
+                <div class="floor-label-col">
+                    <div class="floor-name">Tầng 3</div>
+                    <div class="floor-sub">3 trống / 10 phòng</div>
+                </div>
+                <div class="rooms-grid">
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.301" data-type="Deluxe King" data-floor="Tầng 3" data-status="occupied"><div class="room-code">P.301</div><div class="room-type-small">Deluxe King</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.302" data-type="Deluxe Twin" data-floor="Tầng 3" data-status="occupied"><div class="room-code">P.302</div><div class="room-type-small">Deluxe Twin</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-available" data-room="P.303" data-type="Family Suite" data-floor="Tầng 3" data-status="available"><div class="room-code">P.303</div><div class="room-type-small">Family Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.304" data-type="Deluxe King" data-floor="Tầng 3" data-status="occupied"><div class="room-code">P.304</div><div class="room-type-small">Deluxe King</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-reserved" data-room="P.305" data-type="Suite" data-floor="Tầng 3" data-status="reserved"><div class="room-code">P.305</div><div class="room-type-small">Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-cleaning" data-room="P.306" data-type="Deluxe King" data-floor="Tầng 3" data-status="cleaning"><div class="room-code">P.306</div><div class="room-type-small">Deluxe King</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.307" data-type="Family Suite" data-floor="Tầng 3" data-status="occupied"><div class="room-code">P.307</div><div class="room-type-small">Family Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-available" data-room="P.308" data-type="Deluxe Twin" data-floor="Tầng 3" data-status="available"><div class="room-code">P.308</div><div class="room-type-small">Deluxe Twin</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.309" data-type="Deluxe King" data-floor="Tầng 3" data-status="occupied"><div class="room-code">P.309</div><div class="room-type-small">Deluxe King</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-cleaning" data-room="P.310" data-type="Suite" data-floor="Tầng 3" data-status="cleaning"><div class="room-code">P.310</div><div class="room-type-small">Suite</div></div></div>
+                </div>
+            </div>
+
+            <!-- ==================== TẦNG 2 ==================== -->
+            <div class="floor-row">
+                <div class="floor-label-col">
+                    <div class="floor-name">Tầng 2</div>
+                    <div class="floor-sub">3 trống / 10 phòng</div>
+                </div>
+                <div class="rooms-grid">
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.201" data-type="Deluxe King" data-floor="Tầng 2" data-status="occupied"><div class="room-code">P.201</div><div class="room-type-small">Deluxe King</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.202" data-type="Deluxe Twin" data-floor="Tầng 2" data-status="occupied"><div class="room-code">P.202</div><div class="room-type-small">Deluxe Twin</div></div></div>
+
+                    <!-- Phòng P.203 đang được chọn mặc định giống Figma -->
+                    <div class="room-tile-wrapper" id="defaultRoomWrapper">
+                        <div class="room-tile bg-available selected-tile" data-room="P.203" data-type="Deluxe King" data-floor="Tầng 2" data-status="available">
+                            <div class="room-code">P.203</div>
+                            <div class="room-type-small">Deluxe King</div>
+                        </div>
+
+                        <!-- Popover thao tác phòng -->
+                        <div class="room-popover show" id="roomActionPopover">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bolder text-dark" style="font-size: 0.95rem;" id="popRoomCode">P.203</span>
+                                <span class="popover-status-pill pill-available" id="popStatusBadge">Trống</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted" style="font-size: 0.78rem;">
+                                <span id="popRoomType">Deluxe King</span>
+                                <span id="popRoomFloor">Tầng 2</span>
+                            </div>
+                            <button type="button" class="btn btn-popover-navy" id="popActionBtn" data-bs-toggle="modal" data-bs-target="#checkInModal">
+                                + Check-in
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.204" data-type="Family Suite" data-floor="Tầng 2" data-status="occupied"><div class="room-code">P.204</div><div class="room-type-small">Family Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-reserved" data-room="P.205" data-type="Deluxe King" data-floor="Tầng 2" data-status="reserved"><div class="room-code">P.205</div><div class="room-type-small">Deluxe King</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.206" data-type="Deluxe Twin" data-floor="Tầng 2" data-status="occupied"><div class="room-code">P.206</div><div class="room-type-small">Deluxe Twin</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-available" data-room="P.207" data-type="Deluxe King" data-floor="Tầng 2" data-status="available"><div class="room-code">P.207</div><div class="room-type-small">Deluxe King</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-cleaning" data-room="P.208" data-type="Junior Suite" data-floor="Tầng 2" data-status="cleaning"><div class="room-code">P.208</div><div class="room-type-small">Junior Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.209" data-type="Family Suite" data-floor="Tầng 2" data-status="occupied"><div class="room-code">P.209</div><div class="room-type-small">Family Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-available" data-room="P.210" data-type="Deluxe Twin" data-floor="Tầng 2" data-status="available"><div class="room-code">P.210</div><div class="room-type-small">Deluxe Twin</div></div></div>
+                </div>
+            </div>
+
+            <!-- ==================== TẦNG 1 ==================== -->
+            <div class="floor-row">
+                <div class="floor-label-col">
+                    <div class="floor-name">Tầng 1</div>
+                    <div class="floor-sub">4 trống / 10 phòng</div>
+                </div>
+                <div class="rooms-grid">
+                    <div class="room-tile-wrapper"><div class="room-tile bg-available" data-room="P.101" data-type="Standard" data-floor="Tầng 1" data-status="available"><div class="room-code">P.101</div><div class="room-type-small">Standard</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.102" data-type="Standard" data-floor="Tầng 1" data-status="occupied"><div class="room-code">P.102</div><div class="room-type-small">Standard</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-reserved" data-room="P.103" data-type="Deluxe Twin" data-floor="Tầng 1" data-status="reserved"><div class="room-code">P.103</div><div class="room-type-small">Deluxe Twin</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-available" data-room="P.104" data-type="Standard" data-floor="Tầng 1" data-status="available"><div class="room-code">P.104</div><div class="room-type-small">Standard</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-cleaning" data-room="P.105" data-type="Family Suite" data-floor="Tầng 1" data-status="cleaning"><div class="room-code">P.105</div><div class="room-type-small">Family Suite</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.106" data-type="Deluxe Twin" data-floor="Tầng 1" data-status="occupied"><div class="room-code">P.106</div><div class="room-type-small">Deluxe Twin</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-maintenance" data-room="P.107" data-type="Standard" data-floor="Tầng 1" data-status="maintenance"><div class="room-code">P.107</div><div class="room-type-small">Standard</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-available" data-room="P.108" data-type="Standard" data-floor="Tầng 1" data-status="available"><div class="room-code">P.108</div><div class="room-type-small">Standard</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-occupied" data-room="P.109" data-type="Deluxe Twin" data-floor="Tầng 1" data-status="occupied"><div class="room-code">P.109</div><div class="room-type-small">Deluxe Twin</div></div></div>
+                    <div class="room-tile-wrapper"><div class="room-tile bg-available" data-room="P.110" data-type="Family Suite" data-floor="Tầng 1" data-status="available"><div class="room-code">P.110</div><div class="room-type-small">Family Suite</div></div></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL NHẬN PHÒNG (CHECK-IN) DÀNH CHO LỄ TÂN -->
+    <div class="modal fade" id="checkInModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form action="" method="POST" class="modal-content">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Nhận phòng (Check-in) - <span id="modalRoomTitle" style="color: var(--primary-navy);">P.203</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="room_code" id="modalRoomInput" value="P.203">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Mã đặt phòng (nếu khách đã đặt trước)</label>
+                        <input type="text" name="booking_code" class="form-control" placeholder="VD: BK-2611-025 (Để trống nếu khách vãng lai)">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Họ tên khách nhận phòng <span class="text-danger">*</span></label>
+                        <input type="text" name="guest_name" class="form-control" placeholder="Nguyễn Văn A" required>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Số CCCD / Hộ chiếu <span class="text-danger">*</span></label>
+                            <input type="text" name="id_number" class="form-control" placeholder="079099001234" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Số điện thoại</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="0901 234 567">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label small fw-semibold">Ngày trả phòng dự kiến</label>
+                        <input type="date" name="check_out_date" class="form-control" value="2026-11-11">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn text-white fw-semibold" style="background-color: var(--primary-navy);">Xác nhận Check-in</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const statusConfig = {
+            available:   { label: 'Trống',        pillClass: 'pill-available',   btnText: '+ Check-in' },
+            occupied:    { label: 'Có khách',     pillClass: 'pill-occupied',    btnText: 'Xem thông tin & Check-out' },
+            cleaning:    { label: 'Đang dọn',     pillClass: 'pill-cleaning',    btnText: 'Hoàn tất dọn phòng' },
+            maintenance: { label: 'Bảo trì',      pillClass: 'pill-maintenance', btnText: 'Hoàn tất bảo trì' },
+            reserved:    { label: 'Đã đặt trước', pillClass: 'pill-reserved',    btnText: 'Nhận phòng (Check-in)' }
+        };
+
+        const popover = document.getElementById('roomActionPopover');
+        const popRoomCode = document.getElementById('popRoomCode');
+        const popStatusBadge = document.getElementById('popStatusBadge');
+        const popRoomType = document.getElementById('popRoomType');
+        const popRoomFloor = document.getElementById('popRoomFloor');
+        const popActionBtn = document.getElementById('popActionBtn');
+
+        // 1. Khi bấm vào một phòng bất kỳ -> di chuyển popover tới phòng đó
+        document.querySelectorAll('.room-tile').forEach(tile => {
+            tile.addEventListener('click', function (e) {
+                e.stopPropagation();
+                document.querySelectorAll('.room-tile').forEach(t => t.classList.remove('selected-tile'));
+                this.classList.add('selected-tile');
+
+                const room = this.dataset.room;
+                const type = this.dataset.type;
+                const floor = this.dataset.floor;
+                const status = this.dataset.status;
+                const cfg = statusConfig[status];
+
+                popRoomCode.textContent = room;
+                popRoomType.textContent = type;
+                popRoomFloor.textContent = floor;
+                popStatusBadge.textContent = cfg.label;
+                popStatusBadge.className = 'popover-status-pill ' + cfg.pillClass;
+                popActionBtn.textContent = cfg.btnText;
+
+                document.getElementById('modalRoomTitle').textContent = room;
+                document.getElementById('modalRoomInput').value = room;
+
+                // Gắn popover vào wrapper của phòng được bấm
+                this.parentElement.appendChild(popover);
+                popover.classList.add('show');
+            });
+        });
+
+        // Ẩn popover khi bấm ra vùng trống bên ngoài
+        document.addEventListener('click', function (e) {
+            if (!popover.contains(e.target)) {
+                popover.classList.remove('show');
+                document.querySelectorAll('.room-tile').forEach(t => t.classList.remove('selected-tile'));
+            }
+        });
+
+        // 2. Lọc phòng theo trạng thái khi bấm vào thanh chú thích phía trên
+        let activeFilter = null;
+        document.querySelectorAll('.legend-chip').forEach(chip => {
+            chip.addEventListener('click', function () {
+                const filter = this.dataset.filter;
+                if (activeFilter === filter) {
+                    activeFilter = null;
+                    document.querySelectorAll('.legend-chip').forEach(c => c.classList.remove('active'));
+                    document.querySelectorAll('.room-tile').forEach(t => t.classList.remove('dimmed'));
+                } else {
+                    activeFilter = filter;
+                    document.querySelectorAll('.legend-chip').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelectorAll('.room-tile').forEach(t => {
+                        if (t.dataset.status === filter) {
+                            t.classList.remove('dimmed');
+                        } else {
+                            t.classList.add('dimmed');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

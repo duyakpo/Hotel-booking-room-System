@@ -1,0 +1,777 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài khoản nhân viên - Grand Horizon Hotel</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-navy: #163882;
+            --primary-navy-hover: #0f2861;
+            --primary-navy-light: #eff6ff;
+            --sidebar-width: 240px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #111827;
+            margin: 0;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ==================== SIDEBAR TRÁI ==================== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 14px;
+            flex-shrink: 0;
+        }
+
+        .brand-logo {
+            text-decoration: none;
+            display: inline-flex;
+            flex-direction: column;
+            line-height: 1;
+            padding: 4px 10px 24px 10px;
+        }
+        .brand-logo .script-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.95rem;
+            color: var(--primary-navy);
+        }
+        .brand-logo .sub-name {
+            font-size: 0.6rem;
+            letter-spacing: 0.35em;
+            color: var(--primary-navy);
+            font-weight: 700;
+            margin-top: -2px;
+            padding-left: 2px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        .sidebar-link i {
+            font-size: 1.05rem;
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar-link:hover {
+            background-color: #f3f4f6;
+            color: #111827;
+        }
+        .sidebar-link.active {
+            background-color: var(--primary-navy-light);
+            color: var(--primary-navy);
+            font-weight: 700;
+        }
+
+        /* Tài khoản Quản trị viên ở đáy Sidebar */
+        .sidebar-footer {
+            border-top: 1px solid #f3f4f6;
+            padding-top: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 6px;
+            padding-right: 6px;
+        }
+        .admin-letter-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #111827;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .btn-logout-icon {
+            color: #6b7280;
+            background: none;
+            border: none;
+            padding: 6px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-logout-icon:hover {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* ==================== NỘI DUNG CHÍNH BÊN PHẢI ==================== */
+        .main-content {
+            flex-grow: 1;
+            padding: 28px 32px;
+            overflow-x: hidden;
+        }
+
+        .page-top-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-size: 0.86rem;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .btn-add-staff {
+            background-color: var(--primary-navy);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s;
+        }
+        .btn-add-staff:hover {
+            background-color: var(--primary-navy-hover);
+            color: #ffffff;
+        }
+
+        /* Khung trắng chứa bộ lọc & bảng dữ liệu */
+        .staff-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+        }
+
+        /* Thanh tìm kiếm & lọc trên đầu bảng */
+        .filter-toolbar {
+            padding: 18px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        .search-box-wrapper {
+            position: relative;
+            flex-grow: 1;
+            min-width: 240px;
+        }
+        .search-box-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 0.95rem;
+        }
+        .search-input-field {
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 9px 14px 9px 38px;
+            font-size: 0.86rem;
+            color: #111827;
+            outline: none;
+            background-color: #f9fafb;
+            transition: all 0.2s;
+        }
+        .search-input-field:focus {
+            background-color: #ffffff;
+            border-color: var(--primary-navy);
+            box-shadow: 0 0 0 3px rgba(22, 56, 130, 0.1);
+        }
+
+        .filter-dropdown-box {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px 12px;
+            background-color: #ffffff;
+            font-size: 0.85rem;
+            color: #4b5563;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .filter-dropdown-box select {
+            border: none;
+            font-weight: 700;
+            color: #111827;
+            background: transparent;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Bảng nhân viên */
+        .staff-table {
+            margin-bottom: 0;
+            vertical-align: middle;
+        }
+        .staff-table thead th {
+            background-color: #f9fafb;
+            color: #6b7280;
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 13px 20px;
+            white-space: nowrap;
+        }
+        .staff-table tbody td {
+            font-size: 0.86rem;
+            color: #374151;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            white-space: nowrap;
+        }
+        .staff-table tbody tr:hover {
+            background-color: #fafbfc;
+        }
+
+        /* Dòng nhân viên đã nghỉ việc bị làm mờ giống NV-005 trên Figma */
+        .staff-table tbody tr.row-resigned td {
+            color: #9ca3af !important;
+        }
+        .staff-table tbody tr.row-resigned .role-badge {
+            opacity: 0.55;
+        }
+
+        /* Nhãn Vai trò */
+        .role-badge {
+            font-size: 0.76rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        .role-receptionist {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #dbeafe;
+        }
+        .role-manager {
+            background-color: #f3e8ff;
+            color: #6b21a8;
+            border: 1px solid #e9d5ff;
+        }
+        .role-admin {
+            background-color: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Nhãn Trạng thái */
+        .status-pill {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.02em;
+            display: inline-block;
+        }
+        .status-active {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+        .status-locked {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+        .status-resigned {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+
+        /* Các nút icon Thao tác */
+        .action-icon-btn {
+            background: none;
+            border: none;
+            color: #6b7280;
+            padding: 5px 7px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: all 0.15s;
+            cursor: pointer;
+        }
+        .action-icon-btn:hover:not(:disabled) {
+            background-color: #f3f4f6;
+            color: var(--primary-navy);
+        }
+        .action-icon-btn.btn-unlock-highlight {
+            color: #15803d;
+        }
+        .action-icon-btn:disabled {
+            color: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        /* Chân thẻ: Ghi chú bên trái & Phân trang bên phải */
+        .card-bottom-bar {
+            padding: 16px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            background-color: #ffffff;
+        }
+        .audit-note {
+            font-size: 0.8rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .custom-pagination {
+            margin: 0;
+        }
+        .custom-pagination .page-link {
+            color: #374151;
+            border: 1px solid #e5e7eb;
+            margin: 0 2px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .custom-pagination .page-item.active .page-link {
+            background-color: var(--primary-navy);
+            border-color: var(--primary-navy);
+            color: #ffffff;
+        }
+
+        @media (max-width: 991px) {
+            .admin-layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            .main-content {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-layout">
+    <!-- ==================== SIDEBAR TRÁI ==================== -->
+    <aside class="sidebar">
+        <div>
+            <a href="/" class="brand-logo">
+                <span class="script-name">Grand Horizon</span>
+                <span class="sub-name">HOTEL</span>
+            </a>
+
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="/administrator/staff/" class="sidebar-link active">
+                        <i class="bi bi-people-fill"></i> Tài khoản nhân viên
+                    </a>
+                </li>
+                <li>
+                    <a href="#cau-hinh" class="sidebar-link">
+                        <i class="bi bi-gear"></i> Cấu hình hệ thống
+                    </a>
+                </li>
+                <li>
+                    <a href="#nhat-ky" class="sidebar-link">
+                        <i class="bi bi-journal-text"></i> Nhật ký hệ thống
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tài khoản Quản trị viên ở đáy Sidebar -->
+        <div class="sidebar-footer">
+            <div class="d-flex align-items-center gap-2">
+                <div class="admin-letter-avatar">A</div>
+                <div class="lh-sm">
+                    <div class="fw-bold text-dark" style="font-size: 0.84rem;">Nguyễn Văn A</div>
+                    <div class="text-muted" style="font-size: 0.72rem;">Quản trị viên</div>
+                </div>
+            </div>
+            <a href="/login/" class="btn-logout-icon" title="Đăng xuất">
+                <i class="bi bi-box-arrow-right fs-5"></i>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ==================== NỘI DUNG CHÍNH ==================== -->
+    <main class="main-content">
+        <!-- Tiêu đề & Nút Thêm nhân viên -->
+        <div class="page-top-header">
+            <div>
+                <h1 class="page-title">Tài khoản nhân viên</h1>
+                <p class="page-subtitle">Quản lý tài khoản, phân quyền và trạng thái của nhân viên</p>
+            </div>
+            <button type="button" class="btn btn-add-staff" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                <i class="bi bi-plus-lg"></i> Thêm nhân viên
+            </button>
+        </div>
+
+        <!-- Khung trắng chứa Bộ lọc & Bảng danh sách -->
+        <div class="staff-card">
+            <!-- Thanh tìm kiếm & Lọc -->
+            <div class="filter-toolbar">
+                <div class="search-box-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="staffSearchInput" class="search-input-field" placeholder="Tìm theo tên hoặc email">
+                </div>
+
+                <div class="filter-dropdown-box">
+                    <span>Vai trò:</span>
+                    <select id="roleFilterSelect">
+                        <option value="all" selected>Tất cả</option>
+                        <option value="receptionist">Lễ tân</option>
+                        <option value="manager">Quản lý</option>
+                        <option value="admin">Quản trị viên</option>
+                    </select>
+                </div>
+
+                <div class="filter-dropdown-box">
+                    <span>Trạng thái:</span>
+                    <select id="statusFilterSelect">
+                        <option value="all" selected>Tất cả</option>
+                        <option value="active">Hoạt động</option>
+                        <option value="locked">Bị khóa</option>
+                        <option value="resigned">Đã nghỉ việc</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Bảng danh sách nhân viên -->
+            <div class="table-responsive">
+                <table class="table staff-table" id="staffAccountsTable">
+                    <thead>
+                        <tr>
+                            <th>MÃ NV</th>
+                            <th>HỌ TÊN</th>
+                            <th>EMAIL</th>
+                            <th>VAI TRÒ</th>
+                            <th>TRẠNG THÁI</th>
+                            <th class="text-end">THAO TÁC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- NV-001 -->
+                        <tr data-role="receptionist" data-status="active">
+                            <td class="fw-semibold text-dark">NV-001</td>
+                            <td class="fw-semibold text-dark">Nguyễn Thị Lan</td>
+                            <td>lan.nt@grandhorizon.vn</td>
+                            <td><span class="role-badge role-receptionist">Lễ tân</span></td>
+                            <td><span class="status-pill status-active">HOẠT ĐỘNG</span></td>
+                            <td class="text-end">
+                                <button type="button" class="action-icon-btn edit-staff-btn" title="Chỉnh sửa" data-code="NV-001" data-name="Nguyễn Thị Lan" data-email="lan.nt@grandhorizon.vn" data-role="receptionist" data-status="active" data-bs-toggle="modal" data-bs-target="#editStaffModal">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="action-icon-btn" title="Đặt lại mật khẩu" onclick="alert('Đã gửi mật khẩu tạm thời tới email lan.nt@grandhorizon.vn');">
+                                    <i class="bi bi-key"></i>
+                                </button>
+                                <button type="button" class="action-icon-btn" title="Khóa tài khoản" onclick="confirm('Xác nhận khóa tài khoản NV-001 (Nguyễn Thị Lan)?')">
+                                    <i class="bi bi-lock"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- NV-002 -->
+                        <tr data-role="manager" data-status="active">
+                            <td class="fw-semibold text-dark">NV-002</td>
+                            <td class="fw-semibold text-dark">Trần Quốc Huy</td>
+                            <td>huy.tq@grandhorizon.vn</td>
+                            <td><span class="role-badge role-manager">Quản lý</span></td>
+                            <td><span class="status-pill status-active">HOẠT ĐỘNG</span></td>
+                            <td class="text-end">
+                                <button type="button" class="action-icon-btn edit-staff-btn" title="Chỉnh sửa" data-code="NV-002" data-name="Trần Quốc Huy" data-email="huy.tq@grandhorizon.vn" data-role="manager" data-status="active" data-bs-toggle="modal" data-bs-target="#editStaffModal">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="action-icon-btn" title="Đặt lại mật khẩu" onclick="alert('Đã gửi mật khẩu tạm thời tới email huy.tq@grandhorizon.vn');">
+                                    <i class="bi bi-key"></i>
+                                </button>
+                                <button type="button" class="action-icon-btn" title="Khóa tài khoản" onclick="confirm('Xác nhận khóa tài khoản NV-002 (Trần Quốc Huy)?')">
+                                    <i class="bi bi-lock"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- NV-003 -->
+                        <tr data-role="receptionist" data-status="locked">
+                            <td class="fw-semibold text-dark">NV-003</td>
+                            <td class="fw-semibold text-dark">Lê Minh Tuấn</td>
+                            <td>tuan.lm@grandhorizon.vn</td>
+                            <td><span class="role-badge role-receptionist">Lễ tân</span></td>
+                            <td><span class="status-pill status-locked">BỊ KHÓA</span></td>
+                            <td class="text-end">
+                                <button type="button" class="action-icon-btn edit-staff-btn" title="Chỉnh sửa" data-code="NV-003" data-name="Lê Minh Tuấn" data-email="tuan.lm@grandhorizon.vn" data-role="receptionist" data-status="locked" data-bs-toggle="modal" data-bs-target="#editStaffModal">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="action-icon-btn" title="Đặt lại mật khẩu" onclick="alert('Đã gửi mật khẩu tạm thời tới email tuan.lm@grandhorizon.vn');">
+                                    <i class="bi bi-key"></i>
+                                </button>
+                                <button type="button" class="action-icon-btn btn-unlock-highlight" title="Mở khóa tài khoản" onclick="confirm('Mở khóa lại tài khoản NV-003 (Lê Minh Tuấn)?')">
+                                    <i class="bi bi-unlock"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- NV-004 -->
+                        <tr data-role="receptionist" data-status="active">
+                            <td class="fw-semibold text-dark">NV-004</td>
+                            <td class="fw-semibold text-dark">Phạm Thu Hà</td>
+                            <td>ha.pt@grandhorizon.vn</td>
+                            <td><span class="role-badge role-receptionist">Lễ tân</span></td>
+                            <td><span class="status-pill status-active">HOẠT ĐỘNG</span></td>
+                            <td class="text-end">
+                                <button type="button" class="action-icon-btn edit-staff-btn" title="Chỉnh sửa" data-code="NV-004" data-name="Phạm Thu Hà" data-email="ha.pt@grandhorizon.vn" data-role="receptionist" data-status="active" data-bs-toggle="modal" data-bs-target="#editStaffModal">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="action-icon-btn" title="Đặt lại mật khẩu" onclick="alert('Đã gửi mật khẩu tạm thời tới email ha.pt@grandhorizon.vn');">
+                                    <i class="bi bi-key"></i>
+                                </button>
+                                <button type="button" class="action-icon-btn" title="Khóa tài khoản" onclick="confirm('Xác nhận khóa tài khoản NV-004 (Phạm Thu Hà)?')">
+                                    <i class="bi bi-lock"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- NV-005 (Đã nghỉ việc - vô hiệu hóa thao tác) -->
+                        <tr class="row-resigned" data-role="receptionist" data-status="resigned">
+                            <td class="fw-semibold">NV-005</td>
+                            <td class="fw-semibold">Võ Đức Anh</td>
+                            <td>anh.vd@grandhorizon.vn</td>
+                            <td><span class="role-badge role-receptionist">Lễ tân</span></td>
+                            <td><span class="status-pill status-resigned">ĐÃ NGHỈ VIỆC</span></td>
+                            <td class="text-end">
+                                <button type="button" class="action-icon-btn" disabled title="Tài khoản đã nghỉ việc">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="action-icon-btn" disabled title="Tài khoản đã nghỉ việc">
+                                    <i class="bi bi-key"></i>
+                                </button>
+                                <button type="button" class="action-icon-btn" disabled title="Tài khoản đã nghỉ việc">
+                                    <i class="bi bi-slash-circle"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Ghi chú chân bảng & Phân trang -->
+            <div class="card-bottom-bar">
+                <div class="audit-note">
+                    <i class="bi bi-info-circle"></i>
+                    <span>Tài khoản nghỉ việc được vô hiệu hóa ngay, lịch sử thao tác trên hóa đơn cũ vẫn được giữ lại.</span>
+                </div>
+
+                <nav aria-label="Staff pagination">
+                    <ul class="pagination custom-pagination">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1"><i class="bi bi-chevron-left"></i></a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="?page=1">1</a></li>
+                        <li class="page-item"><a class="page-link" href="?page=2">2</a></li>
+                        <li class="page-item"><a class="page-link" href="?page=3">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=2"><i class="bi bi-chevron-right"></i></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- MODAL 1: THÊM NHÂN VIÊN MỚI -->
+<div class="modal fade" id="addStaffModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="" method="POST" class="modal-content">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create_staff">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Thêm tài khoản nhân viên mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Họ và tên nhân viên <span class="text-danger">*</span></label>
+                    <input type="text" name="full_name" class="form-control" placeholder="VD: Nguyễn Thị Lan" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Email công việc <span class="text-danger">*</span></label>
+                    <input type="email" name="email" class="form-control" placeholder="ten.nv@grandhorizon.vn" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Vai trò phân quyền <span class="text-danger">*</span></label>
+                    <select name="role" class="form-select" required>
+                        <option value="receptionist" selected>Lễ tân</option>
+                        <option value="manager">Quản lý</option>
+                        <option value="admin">Quản trị viên</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label small fw-semibold">Mật khẩu khởi tạo <span class="text-danger">*</span></label>
+                    <input type="password" name="password" class="form-control" placeholder="Tối thiểu 6 ký tự" minlength="6" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-add-staff">Tạo tài khoản</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL 2: CHỈNH SỬA TÀI KHOẢN NHÂN VIÊN -->
+<div class="modal fade" id="editStaffModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="" method="POST" class="modal-content">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_staff">
+            <input type="hidden" name="staff_code" id="editStaffCode">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Cập nhật nhân viên (<span id="editStaffCodeLabel" style="color: var(--primary-navy);"></span>)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Họ và tên</label>
+                    <input type="text" name="full_name" id="editStaffName" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Email</label>
+                    <input type="email" name="email" id="editStaffEmail" class="form-control" required>
+                </div>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Vai trò</label>
+                        <select name="role" id="editStaffRole" class="form-select">
+                            <option value="receptionist">Lễ tân</option>
+                            <option value="manager">Quản lý</option>
+                            <option value="admin">Quản trị viên</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Trạng thái</label>
+                        <select name="status" id="editStaffStatus" class="form-select">
+                            <option value="active">Hoạt động</option>
+                            <option value="locked">Bị khóa</option>
+                            <option value="resigned">Đã nghỉ việc</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
+                <button type="submit" class="btn btn-add-staff">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // 1. Tìm kiếm & Lọc trực tiếp bảng nhân viên
+    const searchInput = document.getElementById('staffSearchInput');
+    const roleSelect = document.getElementById('roleFilterSelect');
+    const statusSelect = document.getElementById('statusFilterSelect');
+    const tableRows = document.querySelectorAll('#staffAccountsTable tbody tr');
+
+    function filterStaffTable() {
+        const keyword = searchInput.value.toLowerCase().trim();
+        const selectedRole = roleSelect.value;
+        const selectedStatus = statusSelect.value;
+
+        tableRows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            const rowRole = row.dataset.role;
+            const rowStatus = row.dataset.status;
+
+            const matchKeyword = text.includes(keyword);
+            const matchRole = (selectedRole === 'all' || rowRole === selectedRole);
+            const matchStatus = (selectedStatus === 'all' || rowStatus === selectedStatus);
+
+            row.style.display = (matchKeyword && matchRole && matchStatus) ? '' : 'none';
+        });
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterStaffTable);
+    if (roleSelect) roleSelect.addEventListener('change', filterStaffTable);
+    if (statusSelect) statusSelect.addEventListener('change', filterStaffTable);
+
+    // 2. Đổ dữ liệu nhân viên vào Modal Chỉnh sửa
+    document.querySelectorAll('.edit-staff-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.getElementById('editStaffCode').value = this.dataset.code;
+            document.getElementById('editStaffCodeLabel').textContent = this.dataset.code;
+            document.getElementById('editStaffName').value = this.dataset.name;
+            document.getElementById('editStaffEmail').value = this.dataset.email;
+            document.getElementById('editStaffRole').value = this.dataset.role;
+            document.getElementById('editStaffStatus').value = this.dataset.status;
+        });
+    });
+</script>
+</body>
+</html>

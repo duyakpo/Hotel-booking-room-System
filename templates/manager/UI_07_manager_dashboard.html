@@ -1,0 +1,691 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Quản lý - Grand Horizon Hotel</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-navy: #163882;
+            --primary-navy-light: #eff6ff;
+            --sidebar-width: 240px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #111827;
+            margin: 0;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ==================== SIDEBAR TRÁI ==================== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 14px;
+            flex-shrink: 0;
+        }
+
+        .brand-logo {
+            text-decoration: none;
+            display: inline-flex;
+            flex-direction: column;
+            line-height: 1;
+            padding: 4px 10px 24px 10px;
+        }
+        .brand-logo .script-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.95rem;
+            color: var(--primary-navy);
+        }
+        .brand-logo .sub-name {
+            font-size: 0.6rem;
+            letter-spacing: 0.35em;
+            color: var(--primary-navy);
+            font-weight: 700;
+            margin-top: -2px;
+            padding-left: 2px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        .sidebar-link i {
+            font-size: 1.05rem;
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar-link:hover {
+            background-color: #f3f4f6;
+            color: #111827;
+        }
+        .sidebar-link.active {
+            background-color: var(--primary-navy-light);
+            color: var(--primary-navy);
+            font-weight: 700;
+        }
+
+        /* Khung tài khoản Quản lý ở đáy Sidebar */
+        .sidebar-footer {
+            border-top: 1px solid #f3f4f6;
+            padding-top: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 6px;
+            padding-right: 6px;
+        }
+        .manager-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .btn-logout-icon {
+            color: #6b7280;
+            background: none;
+            border: none;
+            padding: 6px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-logout-icon:hover {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* ==================== NỘI DUNG CHÍNH BÊN PHẢI ==================== */
+        .main-content {
+            flex-grow: 1;
+            padding: 24px 32px;
+            overflow-x: hidden;
+        }
+
+        .dashboard-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #111827;
+            margin: 0;
+        }
+        .period-select-box {
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 0.85rem;
+            color: #4b5563;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .period-select-box select {
+            border: none;
+            font-weight: 700;
+            color: #111827;
+            background: transparent;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* 4 Thẻ KPI */
+        .kpi-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 18px 20px;
+            height: 100%;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+        .kpi-card.highlight-green {
+            border-left: 3.5px solid #10b981;
+        }
+        .kpi-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+        .kpi-value {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: #111827;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+        .kpi-trend-up {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #10b981;
+        }
+        .kpi-trend-neutral {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        /* Khung Biểu đồ */
+        .chart-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px 22px;
+            height: 100%;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+        .card-section-title {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #111827;
+        }
+        .legend-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+
+        /* Bảng Đặt phòng gần đây */
+        .table-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px 22px;
+            margin-top: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+        .btn-export {
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            color: #374151;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 7px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-export:hover {
+            border-color: var(--primary-navy);
+            color: var(--primary-navy);
+            background-color: #f8fafc;
+        }
+
+        .booking-table {
+            margin-bottom: 0;
+            vertical-align: middle;
+        }
+        .booking-table thead th {
+            background-color: #f9fafb;
+            color: #6b7280;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 12px 14px;
+            white-space: nowrap;
+        }
+        .booking-table tbody td {
+            font-size: 0.85rem;
+            color: #374151;
+            padding: 13px 14px;
+            border-bottom: 1px solid #f3f4f6;
+            white-space: nowrap;
+        }
+        .booking-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Badge trạng thái đơn đặt phòng */
+        .status-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            letter-spacing: 0.02em;
+            display: inline-block;
+        }
+        .badge-pending { background-color: #fef3c7; color: #b45309; }
+        .badge-checkedin { background-color: #dbeafe; color: #1d4ed8; }
+        .badge-confirmed { background-color: #dcfce7; color: #15803d; }
+        .badge-cancelled { background-color: #fee2e2; color: #b91c1c; }
+
+        @media (max-width: 991px) {
+            .admin-layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            .main-content {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-layout">
+    <!-- ==================== SIDEBAR BÊN TRÁI ==================== -->
+    <aside class="sidebar">
+        <div>
+            <a href="/" class="brand-logo">
+                <span class="script-name">Grand Horizon</span>
+                <span class="sub-name">HOTEL</span>
+            </a>
+
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="/manager/dashboard/" class="sidebar-link active">
+                        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="/receptionist/room-rack/" class="sidebar-link">
+                        <i class="bi bi-door-open"></i> Quản lý phòng
+                    </a>
+                </li>
+                <li>
+                    <a href="#bang-gia" class="sidebar-link">
+                        <i class="bi bi-tag"></i> Bảng giá
+                    </a>
+                </li>
+                <li>
+                    <a href="#dich-vu" class="sidebar-link">
+                        <i class="bi bi-bell"></i> Dịch vụ
+                    </a>
+                </li>
+                <li>
+                    <a href="#bao-cao" class="sidebar-link">
+                        <i class="bi bi-file-earmark-bar-graph"></i> Báo cáo
+                    </a>
+                </li>
+                <li>
+                    <a href="#danh-gia" class="sidebar-link">
+                        <i class="bi bi-chat-square-text"></i> Đánh giá
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Thông tin tài khoản Quản lý ở cuối Sidebar -->
+        <div class="sidebar-footer">
+            <div class="d-flex align-items-center gap-2">
+                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" alt="Nguyễn Vũ Duy" class="manager-avatar">
+                <div class="lh-sm">
+                    <div class="fw-bold text-dark" style="font-size: 0.82rem;">Nguyễn Vũ Duy</div>
+                    <div class="text-muted" style="font-size: 0.72rem;">Quản lý</div>
+                </div>
+            </div>
+            <a href="/login/" class="btn-logout-icon" title="Đăng xuất">
+                <i class="bi bi-box-arrow-right fs-5"></i>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ==================== NỘI DUNG CHÍNH DASHBOARD ==================== -->
+    <main class="main-content">
+        <!-- Tiêu đề & Chọn kỳ báo cáo -->
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Dashboard</h1>
+            <div class="period-select-box">
+                <i class="bi bi-calendar3 text-muted"></i>
+                <span>Kỳ báo cáo:</span>
+                <select id="reportPeriodSelect">
+                    <option value="11/2026" selected>Tháng 11/2026</option>
+                    <option value="10/2026">Tháng 10/2026</option>
+                    <option value="09/2026">Tháng 09/2026</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- HÀNG 1: 4 THẺ CHỈ SỐ KPI -->
+        <div class="row g-3 mb-4">
+            <!-- KPI 1: Doanh thu tháng này -->
+            <div class="col-xl-3 col-md-6">
+                <div class="kpi-card highlight-green">
+                    <div class="kpi-label">Doanh thu tháng này</div>
+                    <div class="kpi-value">930.000.000 Đ</div>
+                    <div class="kpi-trend-up">
+                        <i class="bi bi-arrow-up-short"></i> +12% so với tháng trước
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI 2: Tỷ lệ lấp đầy phòng -->
+            <div class="col-xl-3 col-md-6">
+                <div class="kpi-card">
+                    <div class="kpi-label">Tỷ lệ lấp đầy phòng</div>
+                    <div class="kpi-value">78%</div>
+                    <div class="kpi-trend-up">
+                        <i class="bi bi-arrow-up-short"></i> +5% so với tuần trước
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI 3: Số đặt phòng hôm nay -->
+            <div class="col-xl-3 col-md-6">
+                <div class="kpi-card">
+                    <div class="kpi-label">Số đặt phòng hôm nay</div>
+                    <div class="kpi-value">24 đơn</div>
+                    <div class="kpi-trend-neutral">
+                        <i class="bi bi-clock me-1"></i> 8 đơn chờ Check-in
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI 4: Tỷ lệ hủy phòng -->
+            <div class="col-xl-3 col-md-6">
+                <div class="kpi-card">
+                    <div class="kpi-label">Tỷ lệ hủy phòng</div>
+                    <div class="kpi-value">6.2%</div>
+                    <div class="kpi-trend-up">
+                        <i class="bi bi-arrow-down-short"></i> -1.8% so với tháng trước
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HÀNG 2: 2 BIỂU ĐỒ DOANH THU & TỶ LỆ LOẠI PHÒNG -->
+        <div class="row g-3">
+            <!-- Biểu đồ 1: Doanh thu 6 tháng gần nhất -->
+            <div class="col-lg-7">
+                <div class="chart-card">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                        <div>
+                            <span class="card-section-title">Doanh thu 6 tháng gần nhất</span>
+                            <span class="text-muted small ms-1">Triệu đồng</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 small">
+                            <span><span class="legend-dot me-1" style="background-color: #163882;"></span> Tiền phòng</span>
+                            <span><span class="legend-dot me-1" style="background-color: #60a5fa;"></span> Dịch vụ phụ trợ</span>
+                            <span class="fw-bold text-primary">T11: 930 triệu</span>
+                        </div>
+                    </div>
+                    <div style="height: 245px;">
+                        <canvas id="revenueBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Biểu đồ 2: Tỷ lệ loại phòng được đặt -->
+            <div class="col-lg-5">
+                <div class="chart-card">
+                    <div class="card-section-title mb-3">Tỷ lệ loại phòng được đặt</div>
+                    <div class="row align-items-center h-75">
+                        <div class="col-6 position-relative" style="height: 200px;">
+                            <canvas id="roomTypeDonutChart"></canvas>
+                            <div class="position-absolute top-50 start-50 translate-middle text-center pointer-events-none">
+                                <span class="text-muted fw-semibold" style="font-size: 0.78rem;">Loại phòng</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex justify-content-between align-items-center mb-2 small">
+                                <span><span class="legend-dot me-2" style="background-color: #60a5fa;"></span>Tiêu chuẩn</span>
+                                <span class="fw-bold">35%</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2 small">
+                                <span><span class="legend-dot me-2" style="background-color: #163882;"></span>Deluxe</span>
+                                <span class="fw-bold">40%</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2 small">
+                                <span><span class="legend-dot me-2" style="background-color: #f59e0b;"></span>Suite</span>
+                                <span class="fw-bold">15%</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center small">
+                                <span><span class="legend-dot me-2" style="background-color: #10b981;"></span>Gia đình</span>
+                                <span class="fw-bold">10%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HÀNG 3: BẢNG ĐẶT PHÒNG GẦN ĐÂY -->
+        <div class="table-card">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <h5 class="card-section-title mb-0">Đặt phòng gần đây</h5>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn-export" id="exportExcelBtn">
+                        <i class="bi bi-download"></i> Xuất Excel
+                    </button>
+                    <button type="button" class="btn-export" onclick="window.print()">
+                        <i class="bi bi-download"></i> Xuất PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table booking-table" id="recentBookingsTable">
+                    <thead>
+                        <tr>
+                            <th>Mã booking</th>
+                            <th>Tên khách</th>
+                            <th>Phòng</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-semibold text-dark">BK-2611-024</td>
+                            <td>Nguyễn Văn An</td>
+                            <td>P.302</td>
+                            <td>12/11/2026</td>
+                            <td>14/11/2026</td>
+                            <td class="fw-bold text-dark">3.200.000 Đ</td>
+                            <td><span class="status-badge badge-pending">PENDING</span></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-dark">BK-2611-023</td>
+                            <td>Trần Thị Mai</td>
+                            <td>P.205</td>
+                            <td>11/11/2026</td>
+                            <td>13/11/2026</td>
+                            <td class="fw-bold text-dark">4.800.000 Đ</td>
+                            <td><span class="status-badge badge-checkedin">CHECKED-IN</span></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-dark">BK-2611-022</td>
+                            <td>Lê Hoàng Nam</td>
+                            <td>P.401</td>
+                            <td>10/11/2026</td>
+                            <td>15/11/2026</td>
+                            <td class="fw-bold text-dark">12.500.000 Đ</td>
+                            <td><span class="status-badge badge-confirmed">CONFIRMED</span></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-dark">BK-2611-021</td>
+                            <td>Phạm Minh Thư</td>
+                            <td>P.108</td>
+                            <td>12/11/2026</td>
+                            <td>13/11/2026</td>
+                            <td class="fw-bold text-dark">1.600.000 Đ</td>
+                            <td><span class="status-badge badge-cancelled">CANCELLED</span></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-dark">BK-2611-020</td>
+                            <td>Vũ Quốc Bảo</td>
+                            <td>P.304</td>
+                            <td>13/11/2026</td>
+                            <td>16/11/2026</td>
+                            <td class="fw-bold text-dark">6.900.000 Đ</td>
+                            <td><span class="status-badge badge-confirmed">CONFIRMED</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Bootstrap 5 JS & Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Plugin hiển thị tổng doanh thu trên đỉnh từng cột
+    const topTotalLabelPlugin = {
+        id: 'topTotalLabelPlugin',
+        afterDatasetsDraw(chart) {
+            const { ctx } = chart;
+            ctx.save();
+            ctx.font = '600 11px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = '#4b5563';
+            ctx.textAlign = 'center';
+
+            const meta0 = chart.getDatasetMeta(0);
+            const meta1 = chart.getDatasetMeta(1);
+            meta1.data.forEach((bar, index) => {
+                const total = chart.data.datasets[0].data[index] + chart.data.datasets[1].data[index];
+                ctx.fillText(total, bar.x, bar.y - 6);
+            });
+            ctx.restore();
+        }
+    };
+
+    // 1. Biểu đồ cột chồng Doanh thu 6 tháng gần nhất
+    const barCtx = document.getElementById('revenueBarChart');
+    if (barCtx) {
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['T6', 'T7', 'T8', 'T9', 'T10', 'T11'],
+                datasets: [
+                    {
+                        label: 'Tiền phòng',
+                        data: [530, 580, 640, 615, 685, 760],
+                        backgroundColor: '#163882',
+                        barThickness: 22
+                    },
+                    {
+                        label: 'Dịch vụ phụ trợ',
+                        data: [110, 120, 135, 130, 145, 170],
+                        backgroundColor: '#60a5fa',
+                        borderRadius: { topLeft: 4, topRight: 4 },
+                        barThickness: 22
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `${ctx.dataset.label}: ${ctx.raw} triệu đ`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: { display: false }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        max: 1050,
+                        ticks: { stepSize: 200, color: '#9ca3af', font: { size: 11 } },
+                        border: { display: false }
+                    }
+                }
+            },
+            plugins: [topTotalLabelPlugin]
+        });
+    }
+
+    // 2. Biểu đồ tròn Tỷ lệ loại phòng được đặt
+    const donutCtx = document.getElementById('roomTypeDonutChart');
+    if (donutCtx) {
+        new Chart(donutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Deluxe', 'Tiêu chuẩn', 'Suite', 'Gia đình'],
+                datasets: [{
+                    data: [40, 35, 15, 10],
+                    backgroundColor: ['#163882', '#60a5fa', '#f59e0b', '#10b981'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '66%',
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    // 3. Xuất file Excel (CSV) từ bảng Đặt phòng gần đây
+    document.getElementById('exportExcelBtn').addEventListener('click', function () {
+        const rows = document.querySelectorAll('#recentBookingsTable tr');
+        let csvContent = "\uFEFF";
+        rows.forEach(row => {
+            const cols = Array.from(row.querySelectorAll('th, td')).map(col => `"${col.innerText.trim()}"`);
+            csvContent += cols.join(",") + "\n";
+        });
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "Bao_cao_dat_phong_Grand_Horizon.csv";
+        link.click();
+    });
+</script>
+</body>
+</html>

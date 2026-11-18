@@ -1,0 +1,517 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - Grand Horizon Hotel</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-navy: #163882;
+            --primary-navy-hover: #0f2861;
+            --error-red: #dc2626;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #ffffff;
+        }
+
+        .auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* CỘT TRÁI: HÌNH ẢNH & CÂU TRÍCH DẪN */
+        .auth-banner {
+            width: 50%;
+            position: relative;
+            background-image: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1400&q=85');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            padding: 48px;
+        }
+        .auth-banner::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(10, 20, 40, 0.75) 0%, rgba(10, 20, 40, 0.15) 45%, rgba(0, 0, 0, 0.05) 100%);
+        }
+        .banner-quote {
+            position: relative;
+            z-index: 2;
+            color: #ffffff;
+            font-size: 1.05rem;
+            font-weight: 500;
+            line-height: 1.6;
+            max-width: 380px;
+        }
+
+        /* CỘT PHẢI: FORM ĐĂNG NHẬP / ĐĂNG KÝ */
+        .auth-form-side {
+            width: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+            background-color: #ffffff;
+        }
+        .auth-box {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Logo Grand Horizon */
+        .brand-logo {
+            text-decoration: none;
+            display: inline-flex;
+            flex-direction: column;
+            line-height: 1;
+            margin-bottom: 24px;
+        }
+        .brand-logo .script-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.1rem;
+            color: var(--primary-navy);
+        }
+        .brand-logo .sub-name {
+            font-size: 0.62rem;
+            letter-spacing: 0.35em;
+            color: var(--primary-navy);
+            font-weight: 700;
+            margin-top: -2px;
+            padding-left: 2px;
+        }
+
+        .auth-title {
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+        .auth-subtitle {
+            font-size: 0.88rem;
+            color: #6b7280;
+            margin-bottom: 24px;
+        }
+
+        /* Nút Tiếp tục với Google */
+        .btn-google {
+            width: 100%;
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+        .btn-google:hover {
+            background-color: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        /* Đường kẻ chữ "hoặc" */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.82rem;
+            margin: 20px 0;
+        }
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .auth-divider:not(:empty)::before {
+            margin-right: 12px;
+        }
+        .auth-divider:not(:empty)::after {
+            margin-left: 12px;
+        }
+
+        /* Ô nhập liệu có icon bên trong */
+        .field-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .input-icon-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-icon-left {
+            position: absolute;
+            left: 14px;
+            color: #6b7280;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        .input-icon-right {
+            position: absolute;
+            right: 14px;
+            color: #6b7280;
+            font-size: 1rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .auth-input {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 10px 38px 10px 40px;
+            font-size: 0.9rem;
+            color: #111827;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .auth-input:focus {
+            border-color: var(--primary-navy);
+            box-shadow: 0 0 0 3px rgba(22, 56, 130, 0.1);
+        }
+
+        /* Trạng thái báo lỗi đỏ giống Figma */
+        .auth-input.is-invalid-custom {
+            border-color: var(--error-red);
+        }
+        .auth-input.is-invalid-custom:focus {
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+        }
+        .error-feedback-text {
+            color: var(--error-red);
+            font-size: 0.78rem;
+            font-weight: 500;
+            margin-top: 6px;
+            display: none;
+            align-items: center;
+            gap: 5px;
+        }
+        .error-feedback-text.show {
+            display: flex;
+        }
+
+        .forgot-link {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--primary-navy);
+            text-decoration: none;
+        }
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        .btn-navy-submit {
+            width: 100%;
+            background-color: var(--primary-navy);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 11px 16px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-navy-submit:hover {
+            background-color: var(--primary-navy-hover);
+            color: #ffffff;
+        }
+
+        .switch-auth-text {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 22px;
+        }
+        .switch-auth-text a {
+            color: var(--primary-navy);
+            font-weight: 700;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        @media (max-width: 991px) {
+            .auth-banner {
+                display: none;
+            }
+            .auth-form-side {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-wrapper">
+    <!-- CỘT TRÁI: ẢNH RESORT & TRÍCH DẪN -->
+    <div class="auth-banner">
+        <div class="banner-quote">
+            “Mỗi kỳ nghỉ là một ký ức đáng nhớ –<br>
+            Grand Horizon Hotel”
+        </div>
+    </div>
+
+    <!-- CỘT PHẢI: KHUNG ĐĂNG NHẬP / ĐĂNG KÝ -->
+    <div class="auth-form-side">
+        <div class="auth-box">
+            <!-- Logo quay về trang chủ -->
+            <a href="/" class="brand-logo">
+                <span class="script-name">Grand Horizon</span>
+                <span class="sub-name">HOTEL</span>
+            </a>
+
+            <!-- ==================== 1. FORM ĐĂNG NHẬP ==================== -->
+            <div id="loginSection">
+                <h1 class="auth-title">Chào mừng trở lại</h1>
+                <p class="auth-subtitle">Đăng nhập để tiếp tục hành trình của bạn</p>
+
+                <!-- Đăng nhập Google -->
+                <button type="button" class="btn-google">
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.31 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.28 14.24c-.24-.72-.38-1.49-.38-2.24s.14-1.52.38-2.24V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.99-3.14z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.99 3.14c.95-2.85 3.6-4.96 6.72-4.96z"/>
+                    </svg>
+                    Tiếp tục với Google
+                </button>
+
+                <div class="auth-divider">hoặc</div>
+
+                <!-- Thông báo lỗi từ Backend (nếu có) -->
+                {% if error %}
+                <div class="alert alert-danger py-2 px-3 small mb-3">
+                    <i class="bi bi-exclamation-circle me-1"></i> {{ error }}
+                </div>
+                {% endif %}
+
+                <form action="" method="POST" id="loginForm" novalidate>
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="login">
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="loginEmail" class="field-label">Email</label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-envelope input-icon-left"></i>
+                            <input type="email" class="auth-input" id="loginEmail" name="email" placeholder="an-nguyen@email.com" required>
+                        </div>
+                        <div class="error-feedback-text" id="emailErrorMsg">
+                            <i class="bi bi-exclamation-circle"></i> Email không hợp lệ
+                        </div>
+                    </div>
+
+                    <!-- Mật khẩu -->
+                    <div class="mb-2">
+                        <label for="loginPassword" class="field-label">Mật khẩu</label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-lock input-icon-left"></i>
+                            <input type="password" class="auth-input" id="loginPassword" name="password" placeholder="Nhập mật khẩu" required>
+                            <button type="button" class="input-icon-right toggle-password" data-target="loginPassword" aria-label="Hiện mật khẩu">
+                                <i class="bi bi-eye-slash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quên mật khẩu -->
+                    <div class="text-end mb-4">
+                        <a href="#" class="forgot-link" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Quên mật khẩu?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-navy-submit">
+                        Đăng nhập
+                    </button>
+                </form>
+
+                <div class="switch-auth-text">
+                    Chưa có tài khoản? <a id="showRegisterBtn">Đăng ký ngay</a>
+                </div>
+            </div>
+
+            <!-- ==================== 2. FORM ĐĂNG KÝ ==================== -->
+            <div id="registerSection" style="display: none;">
+                <h1 class="auth-title">Tạo tài khoản mới</h1>
+                <p class="auth-subtitle">Đăng ký để trải nghiệm dịch vụ tại Grand Horizon Hotel</p>
+
+                <form action="" method="POST" id="registerForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="register">
+
+                    <div class="mb-3">
+                        <label for="regFullName" class="field-label">Họ và tên</label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-person input-icon-left"></i>
+                            <input type="text" class="auth-input" id="regFullName" name="full_name" placeholder="Nguyễn Văn An" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="regEmail" class="field-label">Email</label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-envelope input-icon-left"></i>
+                            <input type="email" class="auth-input" id="regEmail" name="email" placeholder="an.nguyen@email.com" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="regPhone" class="field-label">Số điện thoại</label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-telephone input-icon-left"></i>
+                            <input type="tel" class="auth-input" id="regPhone" name="phone" placeholder="0912 345 678" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="regPassword" class="field-label">Mật khẩu</label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-lock input-icon-left"></i>
+                            <input type="password" class="auth-input" id="regPassword" name="password" placeholder="Tối thiểu 6 ký tự" minlength="6" required>
+                            <button type="button" class="input-icon-right toggle-password" data-target="regPassword">
+                                <i class="bi bi-eye-slash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="regConfirmPassword" class="field-label">Xác nhận mật khẩu</label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-shield-check input-icon-left"></i>
+                            <input type="password" class="auth-input" id="regConfirmPassword" name="confirm_password" placeholder="Nhập lại mật khẩu" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-navy-submit">
+                        Đăng ký ngay
+                    </button>
+                </form>
+
+                <div class="switch-auth-text">
+                    Đã có tài khoản? <a id="showLoginBtn">Đăng nhập</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Quên mật khẩu -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Khôi phục mật khẩu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small text-muted">Nhập địa chỉ email đã đăng ký, hệ thống sẽ gửi liên kết đặt lại mật khẩu cho bạn.</p>
+                <input type="email" class="form-control" placeholder="Nhập email của bạn...">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-navy-submit w-auto px-4" data-bs-dismiss="modal" onclick="alert('Đã gửi hướng dẫn khôi phục mật khẩu qua email!');">Gửi yêu cầu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // 1. Ẩn / hiện mật khẩu khi bấm vào icon con mắt
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const targetId = this.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            const icon = this.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
+            }
+        });
+    });
+
+    // 2. Kiểm tra định dạng Email (hiển thị viền đỏ & "Email không hợp lệ" giống Figma)
+    const loginEmail = document.getElementById('loginEmail');
+    const emailErrorMsg = document.getElementById('emailErrorMsg');
+    const loginForm = document.getElementById('loginForm');
+
+    function validateEmailField() {
+        const val = loginEmail.value.trim();
+        const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+        if (val.length > 0 && !isValid) {
+            loginEmail.classList.add('is-invalid-custom');
+            emailErrorMsg.classList.add('show');
+            return false;
+        } else {
+            loginEmail.classList.remove('is-invalid-custom');
+            emailErrorMsg.classList.remove('show');
+            return val.length > 0;
+        }
+    }
+
+    if (loginEmail) {
+        loginEmail.addEventListener('input', validateEmailField);
+        loginEmail.addEventListener('blur', validateEmailField);
+    }
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', function (e) {
+            if (!validateEmailField()) {
+                e.preventDefault();
+                loginEmail.classList.add('is-invalid-custom');
+                emailErrorMsg.classList.add('show');
+                loginEmail.focus();
+            }
+        });
+    }
+
+    // 3. Chuyển đổi qua lại giữa form Đăng nhập và Đăng ký
+    const loginSection = document.getElementById('loginSection');
+    const registerSection = document.getElementById('registerSection');
+    const showRegisterBtn = document.getElementById('showRegisterBtn');
+    const showLoginBtn = document.getElementById('showLoginBtn');
+
+    if (showRegisterBtn) {
+        showRegisterBtn.addEventListener('click', () => {
+            loginSection.style.display = 'none';
+            registerSection.style.display = 'block';
+        });
+    }
+    if (showLoginBtn) {
+        showLoginBtn.addEventListener('click', () => {
+            registerSection.style.display = 'none';
+            loginSection.style.display = 'block';
+        });
+    }
+</script>
+</body>
+</html>

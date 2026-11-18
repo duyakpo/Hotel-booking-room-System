@@ -1,0 +1,540 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Đặt phòng - Grand Horizon Hotel{% endblock %}
+{% block nav_rooms %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f9fafb;
+    }
+
+    .booking-page-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 20px;
+    }
+
+    /* Thanh tiến trình 3 bước */
+    .booking-stepper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        position: relative;
+    }
+    .step-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f9fafb;
+        padding-right: 12px;
+        z-index: 2;
+    }
+    .step-item.middle {
+        padding-left: 12px;
+    }
+    .step-item.end {
+        padding-left: 12px;
+        padding-right: 0;
+    }
+    .step-circle {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+    .step-circle.completed,
+    .step-circle.active {
+        background-color: var(--primary-navy);
+        color: #ffffff;
+    }
+    .step-circle.inactive {
+        background-color: #e5e7eb;
+        color: #6b7280;
+    }
+    .step-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #111827;
+    }
+    .step-label.inactive {
+        color: #9ca3af;
+        font-weight: 500;
+    }
+    .stepper-line {
+        flex-grow: 1;
+        height: 1.5px;
+        background-color: #d1d5db;
+        margin: 0 8px;
+    }
+    .stepper-line.completed {
+        background-color: var(--primary-navy);
+    }
+
+    /* Khung trắng bên trái */
+    .booking-main-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+    }
+
+    /* Thanh tóm tắt phòng đã chọn phía trên form */
+    .selected-room-banner {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+    }
+    .room-icon-box {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        background-color: #e0e7ff;
+        color: var(--primary-navy);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+    .room-count-pill {
+        background-color: #e0e7ff;
+        color: var(--primary-navy);
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+        white-space: nowrap;
+    }
+
+    .section-heading {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 16px;
+    }
+
+    .form-label-custom {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+
+    .form-control-custom,
+    .form-select-custom {
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        color: #111827;
+    }
+    .form-control-custom:focus,
+    .form-select-custom:focus {
+        border-color: var(--primary-navy);
+        box-shadow: 0 0 0 3px rgba(22, 56, 130, 0.1);
+    }
+
+    /* Khung yêu cầu xuất hóa đơn VAT */
+    .vat-box {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background-color: #ffffff;
+        height: 100%;
+    }
+    .vat-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background-color: #eff6ff;
+        color: var(--primary-navy);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .form-switch .form-check-input {
+        width: 2.6em;
+        height: 1.35em;
+        cursor: pointer;
+    }
+    .form-switch .form-check-input:checked {
+        background-color: var(--primary-navy);
+        border-color: var(--primary-navy);
+    }
+
+    /* Thẻ Phương thức thanh toán */
+    .payment-option-card {
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        height: 100%;
+        background-color: #ffffff;
+        display: block;
+    }
+    .payment-option-card:hover {
+        border-color: #93c5fd;
+    }
+    .payment-option-card.selected {
+        border-color: var(--primary-navy);
+        background-color: #f8faff;
+    }
+    .payment-radio {
+        accent-color: var(--primary-navy);
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+    /* Khung đồng hồ giữ phòng màu vàng bên phải */
+    .hold-timer-card {
+        background-color: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 18px;
+    }
+    .hold-timer-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #b45309;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .hold-timer-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #92400e;
+        line-height: 1.1;
+        margin: 6px 0;
+    }
+    .hold-timer-value span {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #b45309;
+    }
+    .hold-timer-note {
+        font-size: 0.8rem;
+        color: #92400e;
+        border-top: 1px solid #fde68a;
+        padding-top: 10px;
+        margin-top: 8px;
+    }
+
+    /* Khung tóm tắt đơn & giá tiền bên phải */
+    .summary-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+    }
+    .summary-room-img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 14px;
+    }
+    .night-badge {
+        background-color: #e0e7ff;
+        color: var(--primary-navy);
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.875rem;
+        color: #4b5563;
+        margin-bottom: 10px;
+    }
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 14px;
+        margin-top: 10px;
+    }
+    .total-label {
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: #111827;
+        text-transform: uppercase;
+    }
+    .total-amount {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--primary-navy);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4 pb-5">
+    <h1 class="booking-page-title">Đặt phòng</h1>
+
+    <!-- THANH TIẾN TRÌNH 3 BƯỚC -->
+    <div class="booking-stepper">
+        <div class="step-item">
+            <span class="step-circle completed"><i class="bi bi-check-lg"></i></span>
+            <span class="step-label">Chọn phòng</span>
+        </div>
+        <div class="stepper-line completed"></div>
+        <div class="step-item middle">
+            <span class="step-circle active">2</span>
+            <span class="step-label">Thông tin khách hàng</span>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="step-item end">
+            <span class="step-circle inactive">3</span>
+            <span class="step-label inactive">Thanh toán</span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- CỘT TRÁI: FORM THÔNG TIN KHÁCH HÀNG & THANH TOÁN -->
+        <div class="col-lg-8">
+            <form action="" method="POST" class="booking-main-card">
+                {% csrf_token %}
+
+                <!-- Thông tin phòng đã chọn tóm tắt -->
+                <div class="selected-room-banner">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="room-icon-box">
+                            <i class="bi bi-door-open-fill"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark" style="font-size: 0.95rem;">Phòng Deluxe King</div>
+                            <div class="text-muted small">
+                                <i class="bi bi-calendar3 me-1"></i> 09/11/2026 - 11/11/2026 &middot; 2 đêm &middot;
+                                <i class="bi bi-people me-1"></i> 2 người lớn &middot;
+                                <i class="bi bi-plus-square me-1"></i> 1 giường phụ
+                            </div>
+                        </div>
+                    </div>
+                    <span class="room-count-pill">1 phòng</span>
+                </div>
+
+                <!-- Phần 1: Thông tin khách hàng -->
+                <h5 class="section-heading">Thông tin khách hàng</h5>
+
+                <div class="mb-3">
+                    <label for="full_name" class="form-label-custom">Họ tên <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-custom" id="full_name" name="full_name" placeholder="Nguyễn Văn An" required>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="email" class="form-label-custom">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control form-control-custom" id="email" name="email" placeholder="an.nguyen@email.com" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label-custom">Số điện thoại <span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control form-control-custom" id="phone" name="phone" placeholder="0912 345 678" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="notes" class="form-label-custom">Ghi chú</label>
+                    <input type="text" class="form-control form-control-custom" id="notes" name="notes" placeholder="Yêu cầu thêm về phòng hoặc giờ đến">
+                </div>
+
+                <div class="row g-3 mb-4 align-items-stretch">
+                    <div class="col-md-4">
+                        <label for="arrival_time" class="form-label-custom">Giờ đến</label>
+                        <select class="form-select form-select-custom" id="arrival_time" name="arrival_time">
+                            <option value="14:00 - 15:00" selected>14:00 - 15:00</option>
+                            <option value="15:00 - 16:00">15:00 - 16:00</option>
+                            <option value="16:00 - 18:00">16:00 - 18:00</option>
+                            <option value="18:00 - 20:00">18:00 - 20:00</option>
+                            <option value="Sau 20:00">Sau 20:00</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8 d-flex flex-column justify-content-end">
+                        <div class="vat-box">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="vat-icon">
+                                    <i class="bi bi-receipt"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">Yêu cầu xuất hóa đơn VAT</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">Hóa đơn điện tử sẽ được gửi qua email sau khi hoàn tất thanh toán 24 giờ</div>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" role="switch" id="require_vat" name="require_vat">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4" style="border-color: #f3f4f6;">
+
+                <!-- Phần 2: Phương thức thanh toán -->
+                <h5 class="section-heading">Phương thức thanh toán</h5>
+
+                <div class="row g-3 mb-4">
+                    <!-- Thẻ ngân hàng -->
+                    <div class="col-md-4">
+                        <label class="payment-option-card selected" for="payBank">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <input class="payment-radio" type="radio" name="payment_method" id="payBank" value="bank_card" checked>
+                                <i class="bi bi-credit-card text-primary"></i>
+                                <span class="fw-bold text-dark" style="font-size: 0.85rem;">Thẻ ngân hàng</span>
+                            </div>
+                            <div class="text-muted ps-4" style="font-size: 0.75rem;">Visa, Mastercard, JCB</div>
+                        </label>
+                    </div>
+
+                    <!-- Ví điện tử -->
+                    <div class="col-md-4">
+                        <label class="payment-option-card" for="payWallet">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <input class="payment-radio" type="radio" name="payment_method" id="payWallet" value="e_wallet">
+                                <i class="bi bi-wallet2 text-primary"></i>
+                                <span class="fw-bold text-dark" style="font-size: 0.85rem;">Ví điện tử</span>
+                            </div>
+                            <div class="text-muted ps-4" style="font-size: 0.75rem;">MoMo, ZaloPay, VNPay</div>
+                        </label>
+                    </div>
+
+                    <!-- Thanh toán tại khách sạn -->
+                    <div class="col-md-4">
+                        <label class="payment-option-card" for="payHotel">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <input class="payment-radio" type="radio" name="payment_method" id="payHotel" value="pay_at_hotel">
+                                <i class="bi bi-building-check text-primary"></i>
+                                <span class="fw-bold text-dark" style="font-size: 0.85rem;">Thanh toán tại khách sạn</span>
+                            </div>
+                            <div class="text-muted ps-4" style="font-size: 0.75rem;">Trả tiền mặt khi nhận phòng</div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Nút điều hướng dưới cùng -->
+                <div class="d-flex justify-content-between align-items-center pt-2">
+                    <a href="/rooms/" class="btn btn-outline-secondary px-4 py-2 rounded-2 fw-semibold" style="font-size: 0.9rem;">
+                        <i class="bi bi-chevron-left me-1"></i> Quay lại
+                    </a>
+                    <button type="submit" class="btn btn-navy px-4 py-2.5 rounded-2" style="padding: 10px 24px; font-size: 0.9rem;">
+                        Xác nhận &amp; thanh toán <i class="bi bi-arrow-right ms-1"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- CỘT PHẢI: ĐỒNG HỒ GIỮ PHÒNG & TÓM TẮT CHI PHÍ -->
+        <div class="col-lg-4">
+            <!-- Đồng hồ đếm ngược giữ phòng (UC-07 Booking Hold) -->
+            <div class="hold-timer-card">
+                <div class="hold-timer-label">
+                    <i class="bi bi-clock-fill"></i> THỜI GIAN GIỮ PHÒNG
+                </div>
+                <div class="hold-timer-value">
+                    <strong id="holdCountdown">09:47</strong> <span>còn lại</span>
+                </div>
+                <div class="hold-timer-note">
+                    Phòng đang được giữ cho bạn. Vui lòng hoàn tất trước khi hết giờ.
+                </div>
+            </div>
+
+            <!-- Thẻ tóm tắt phòng và tổng tiền -->
+            <div class="summary-card">
+                <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80" class="summary-room-img" alt="Phòng Deluxe King">
+
+                <h5 class="fw-bold text-dark mb-2" style="font-size: 1.05rem;">Phòng Deluxe King</h5>
+
+                <div class="text-muted small mb-1">
+                    <i class="bi bi-people me-2"></i> 2 người
+                </div>
+                <div class="text-muted small mb-1">
+                    <i class="bi bi-arrows-angle-expand me-2"></i> 35m²
+                </div>
+                <div class="d-flex justify-content-between align-items-center text-muted small mb-3">
+                    <span><i class="bi bi-calendar3 me-2"></i> 09/11/2026 - 11/11/2026</span>
+                    <span class="night-badge">2 đêm</span>
+                </div>
+
+                <hr style="border-color: #f3f4f6;">
+
+                <!-- Chi tiết giá -->
+                <div class="price-row">
+                    <span>Tiền phòng</span>
+                    <span class="fw-semibold text-dark">2.400.000 đ</span>
+                </div>
+                <div class="price-row">
+                    <span>Giường phụ</span>
+                    <span class="fw-semibold text-dark">+300.000 đ</span>
+                </div>
+                <div class="price-row">
+                    <span>VAT 10%</span>
+                    <span class="fw-semibold text-dark">+240.000 đ</span>
+                </div>
+
+                <!-- Tổng cộng -->
+                <div class="total-row">
+                    <span class="total-label">TỔNG CỘNG</span>
+                    <span class="total-amount">2.940.000 đ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Hiệu ứng viền xanh khi chọn Phương thức thanh toán
+    document.querySelectorAll('.payment-radio').forEach(radio => {
+        radio.addEventListener('change', function () {
+            document.querySelectorAll('.payment-option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            if (this.checked) {
+                this.closest('.payment-option-card').classList.add('selected');
+            }
+        });
+    });
+
+    // Đồng hồ đếm ngược thời gian giữ phòng từ 09:47
+    let totalSeconds = 9 * 60 + 47;
+    const countdownEl = document.getElementById('holdCountdown');
+    if (countdownEl) {
+        const timer = setInterval(() => {
+            if (totalSeconds <= 0) {
+                clearInterval(timer);
+                countdownEl.textContent = "00:00";
+                return;
+            }
+            totalSeconds--;
+            const mins = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+            const secs = String(totalSeconds % 60).padStart(2, '0');
+            countdownEl.textContent = `${mins}:${secs}`;
+        }, 1000);
+    }
+</script>
+{% endblock %}
