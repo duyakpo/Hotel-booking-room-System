@@ -1,0 +1,717 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Phòng Deluxe King (Hướng biển) - Grand Horizon Hotel{% endblock %}
+{% block nav_rooms %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f9fafb;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb-bar {
+        padding: 18px 0 14px 0;
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+    .breadcrumb-bar a {
+        color: #6b7280;
+        text-decoration: none;
+    }
+    .breadcrumb-bar a:hover {
+        color: var(--primary-navy);
+    }
+
+    /* Lưới 4 ảnh phòng phía trên */
+    .gallery-grid {
+        margin-bottom: 24px;
+    }
+    .gallery-main-box {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 360px;
+    }
+    .gallery-main-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    .gallery-main-box:hover img,
+    .gallery-sub-box:hover img {
+        transform: scale(1.03);
+    }
+    .gallery-badge-top {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        background: rgba(255, 255, 255, 0.92);
+        color: #111827;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .gallery-sub-box {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 174px;
+    }
+    .gallery-sub-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    .btn-view-all-photos {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        background: rgba(17, 24, 39, 0.85);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 8px;
+        backdrop-filter: blur(4px);
+    }
+    .btn-view-all-photos:hover {
+        background: #111827;
+        color: #ffffff;
+    }
+
+    /* Các khung nội dung trắng bên trái */
+    .detail-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+    .badge-deal {
+        background-color: #dcfce7;
+        color: #15803d;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+    }
+    .badge-view {
+        background-color: #e0e7ff;
+        color: var(--primary-navy);
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+    }
+    .room-detail-title {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: #111827;
+        margin: 10px 0 8px 0;
+    }
+    .room-specs-line {
+        font-size: 0.88rem;
+        color: #4b5563;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 10px;
+    }
+    .room-rating-line {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: #111827;
+    }
+    .section-card-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 14px;
+    }
+    .amenity-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.9rem;
+        color: #374151;
+        margin-bottom: 12px;
+    }
+    .amenity-item i {
+        color: var(--primary-navy);
+        font-size: 1.05rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Khung Chính sách hủy phòng nền xanh nhạt */
+    .policy-box {
+        background-color: #f0f5ff;
+        border: 1px solid #dbeafe;
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 20px;
+    }
+    .policy-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--primary-navy);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .policy-list {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 0.88rem;
+        color: #374151;
+    }
+    .policy-list li {
+        margin-bottom: 6px;
+    }
+    .free-cancel-pill {
+        background-color: #dcfce7;
+        color: #15803d;
+        font-weight: 700;
+        font-size: 0.78rem;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+
+    /* Khu vực Đánh giá & Nhận xét */
+    .rating-summary-box {
+        background-color: #f9fafb;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    .big-rating-score {
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: var(--primary-navy);
+        line-height: 1;
+    }
+    .rating-bar-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+        font-size: 0.82rem;
+    }
+    .rating-bar-label {
+        width: 70px;
+        color: #4b5563;
+        font-weight: 500;
+    }
+    .rating-bar-track {
+        flex-grow: 1;
+        height: 7px;
+        background-color: #e5e7eb;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .rating-bar-fill {
+        height: 100%;
+        background-color: #f59e0b;
+        border-radius: 4px;
+    }
+    .rating-bar-val {
+        width: 65px;
+        text-align: right;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .review-item {
+        border-bottom: 1px solid #f3f4f6;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
+    .review-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+    .reviewer-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e0e7ff;
+        color: var(--primary-navy);
+        font-weight: 700;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .manager-reply-box {
+        background-color: #f8fafc;
+        border-left: 3px solid var(--primary-navy);
+        border-radius: 0 8px 8px 0;
+        padding: 12px 16px;
+        margin-top: 12px;
+        margin-left: 52px;
+        font-size: 0.84rem;
+    }
+
+    /* Khung Đặt phòng bên phải (Sticky) */
+    .booking-widget-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        position: sticky;
+        top: 90px;
+    }
+    .widget-price-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .widget-price-main {
+        font-size: 1.55rem;
+        font-weight: 800;
+        color: var(--primary-navy);
+    }
+    .widget-input-group {
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 16px;
+    }
+    .widget-input-box {
+        padding: 8px 12px;
+    }
+    .widget-input-box label {
+        display: block;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+    }
+    .widget-input-box input,
+    .widget-input-box select {
+        border: none;
+        padding: 0;
+        width: 100%;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #111827;
+        background: transparent;
+        outline: none;
+    }
+    .btn-widget-sub {
+        border: 1px solid #e5e7eb;
+        background: #ffffff;
+        color: #374151;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 8px 10px;
+        border-radius: 8px;
+        width: 100%;
+        transition: all 0.2s;
+    }
+    .btn-widget-sub:hover {
+        border-color: var(--primary-navy);
+        color: var(--primary-navy);
+    }
+
+    @media (max-width: 767px) {
+        .gallery-main-box { height: 240px; }
+        .gallery-sub-box { height: 140px; }
+        .manager-reply-box { margin-left: 0; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5">
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb-bar">
+        <a href="/">Trang chủ</a> <span class="mx-1">/</span>
+        <a href="/rooms/">Danh sách phòng</a> <span class="mx-1">/</span>
+        <span class="text-dark fw-semibold">Phòng Deluxe King (Hướng biển)</span>
+    </div>
+
+    <!-- BỘ SƯU TẬP 4 ẢNH PHÒNG -->
+    <div class="row g-3 gallery-grid">
+        <!-- Ảnh lớn bên trái -->
+        <div class="col-lg-7">
+            <div class="gallery-main-box">
+                <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=1200&q=80" alt="Ảnh thực tế phòng ngủ">
+                <span class="gallery-badge-top">Ảnh thực tế phòng ngủ</span>
+            </div>
+        </div>
+
+        <!-- 3 ảnh nhỏ bên phải -->
+        <div class="col-lg-5">
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="gallery-sub-box">
+                        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80" alt="Phòng tắm">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="gallery-sub-box">
+                        <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=600&q=80" alt="Ban công hướng biển">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="gallery-sub-box">
+                        <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=900&q=80" alt="Góc làm việc">
+                        <button type="button" class="btn btn-view-all-photos" data-bs-toggle="modal" data-bs-target="#galleryModal">
+                            <i class="bi bi-grid-3x3-gap-fill me-1"></i> Xem tất cả ảnh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NỘI DUNG CHI TIẾT (TRÁI) & KHUNG ĐẶT PHÒNG (PHẢI) -->
+    <div class="row g-4">
+        <!-- CỘT TRÁI -->
+        <div class="col-lg-8">
+            <!-- 1. Tiêu đề & Thông số phòng -->
+            <div class="detail-card">
+                <div class="d-flex gap-2">
+                    <span class="badge-deal">Giá tốt độc quyền</span>
+                    <span class="badge-view">View trực diện biển</span>
+                </div>
+
+                <h1 class="room-detail-title">Phòng Deluxe King (Hướng biển)</h1>
+
+                <div class="room-specs-line">
+                    <span><i class="bi bi-arrows-angle-expand me-1 text-muted"></i> 35m²</span>
+                    <span>&middot;</span>
+                    <span><i class="bi bi-people me-1 text-muted"></i> Tối đa 2 người lớn, 1 trẻ em</span>
+                    <span>&middot;</span>
+                    <span><i class="bi bi-bed me-1 text-muted"></i> 1 Giường King lớn</span>
+                    <span>&middot;</span>
+                    <span><i class="bi bi-building me-1 text-muted"></i> Tầng 5 - 8</span>
+                </div>
+
+                <div class="room-rating-line">
+                    <i class="bi bi-star-fill text-warning me-1"></i> 4.8 / 5.0
+                    <span class="text-muted fw-normal ms-1">&middot; <a href="#reviews-section" class="text-decoration-underline text-muted">185 đánh giá từ khách thực tế</a></span>
+                </div>
+            </div>
+
+            <!-- 2. Mô tả phòng -->
+            <div class="detail-card">
+                <h5 class="section-card-title">Mô tả</h5>
+                <p class="text-muted mb-0" style="font-size: 0.92rem; line-height: 1.65;">
+                    Không gian nghỉ dưỡng sang trọng bậc nhất với sàn gỗ tự nhiên ấm cúng, thiết kế hiện đại kết hợp nét duyên dáng Á Đông. Ban công riêng thoáng đãng đón trọn làn gió biển mát lành và tầm nhìn hoàng hôn tuyệt đẹp. Trang bị đầy đủ tiện nghi cao cấp đáp ứng trọn vẹn kỳ nghỉ dưỡng hoàn hảo của quý khách.
+                </p>
+            </div>
+
+            <!-- 3. Tiện nghi phòng -->
+            <div class="detail-card">
+                <h5 class="section-card-title">Tiện nghi phòng</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="amenity-item"><i class="bi bi-wifi"></i> WiFi tốc độ cao</div>
+                        <div class="amenity-item"><i class="bi bi-snow"></i> Điều hòa 2 chiều</div>
+                        <div class="amenity-item"><i class="bi bi-cup-hot"></i> Máy pha cà phê &amp; Minibar</div>
+                        <div class="amenity-item mb-md-0"><i class="bi bi-shield-lock"></i> Két sắt an toàn</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="amenity-item"><i class="bi bi-droplet"></i> Bồn tắm nằm cao cấp</div>
+                        <div class="amenity-item"><i class="bi bi-tv"></i> Smart TV 55 inch</div>
+                        <div class="amenity-item"><i class="bi bi-tsunami"></i> Ban công ngắm biển</div>
+                        <div class="amenity-item mb-0"><i class="bi bi-p-square"></i> Chỗ đỗ xe miễn phí</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Chính sách hủy phòng -->
+            <div class="policy-box">
+                <div class="policy-title">
+                    <i class="bi bi-info-circle-fill"></i> Chính sách hủy phòng
+                </div>
+                <ul class="policy-list">
+                    <li>Hủy trước 72 giờ (trước 14:00 ngày nhận phòng): <span class="free-cancel-pill">Miễn phí hủy 100%</span></li>
+                    <li>Hủy từ 24h - 72h: Phạt phí đêm đầu tiên.</li>
+                    <li>Hủy trong vòng 24h: Không hoàn tiền.</li>
+                </ul>
+            </div>
+
+            <!-- 5. Đánh giá & Nhận xét (UC-14) -->
+            <div class="detail-card" id="reviews-section">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="section-card-title mb-0">Đánh giá &amp; Nhận xét</h5>
+                    <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#writeReviewModal">
+                        <i class="bi bi-pencil-square me-1"></i> Viết đánh giá
+                    </button>
+                </div>
+
+                <!-- Bảng tổng hợp điểm -->
+                <div class="rating-summary-box">
+                    <div class="row align-items-center g-4">
+                        <div class="col-md-4 text-center border-end">
+                            <div class="big-rating-score">4.8 <i class="bi bi-star-fill text-warning fs-3"></i></div>
+                            <div class="text-muted small mt-2">Tuyệt vời &middot; 185 đánh giá</div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="rating-bar-row">
+                                <span class="rating-bar-label">Sạch sẽ</span>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 98%;"></div></div>
+                                <span class="rating-bar-val">4.9 (98%)</span>
+                            </div>
+                            <div class="rating-bar-row">
+                                <span class="rating-bar-label">Tiện nghi</span>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 96%;"></div></div>
+                                <span class="rating-bar-val">4.8 (96%)</span>
+                            </div>
+                            <div class="rating-bar-row">
+                                <span class="rating-bar-label">Vị trí</span>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 98%;"></div></div>
+                                <span class="rating-bar-val">4.9 (98%)</span>
+                            </div>
+                            <div class="rating-bar-row mb-0">
+                                <span class="rating-bar-label">Phục vụ</span>
+                                <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 94%;"></div></div>
+                                <span class="rating-bar-val">4.7 (94%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danh sách bình luận -->
+                <!-- Bình luận 1 -->
+                <div class="review-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="d-flex gap-3">
+                            <div class="reviewer-avatar">HN</div>
+                            <div>
+                                <div class="fw-bold text-dark" style="font-size: 0.92rem;">Nguyễn Hoàng Nam</div>
+                                <div class="text-muted" style="font-size: 0.78rem;">Lưu trú: Tháng 10/2026</div>
+                            </div>
+                        </div>
+                        <div class="text-warning small fw-bold">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <span class="text-dark ms-1">5.0</span>
+                        </div>
+                    </div>
+                    <p class="text-dark mt-2 mb-0 ps-md-5 ms-md-2" style="font-size: 0.88rem;">
+                        Phòng ốc sạch sẽ, view biển ngắm hoàng hôn rất chill. Nhân viên phục vụ nhiệt tình và chu đáo, chắc chắn sẽ quay lại!
+                    </p>
+                    <div class="manager-reply-box">
+                        <div class="fw-bold text-dark mb-1" style="font-size: 0.8rem;">Phản hồi từ Quản lý Grand Horizon Hotel</div>
+                        <div class="text-muted">Cảm ơn quý khách Hoàng Nam đã tin tưởng lựa chọn khách sạn. Rất vinh hạnh được đón tiếp quý khách trong những kỳ nghỉ tiếp theo.</div>
+                    </div>
+                </div>
+
+                <!-- Bình luận 2 -->
+                <div class="review-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="d-flex gap-3">
+                            <div class="reviewer-avatar" style="background-color: #f3e8ff; color: #6b21a8;">MA</div>
+                            <div>
+                                <div class="fw-bold text-dark" style="font-size: 0.92rem;">Trần Mai Anh</div>
+                                <div class="text-muted" style="font-size: 0.78rem;">Lưu trú: Tháng 10/2026</div>
+                            </div>
+                        </div>
+                        <div class="text-warning small fw-bold">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <span class="text-dark ms-1">5.0</span>
+                        </div>
+                    </div>
+                    <p class="text-dark mt-2 mb-0 ps-md-5 ms-md-2" style="font-size: 0.88rem;">
+                        Giường ngủ cực kỳ êm ái, bồn tắm rộng rãi thư giãn. Bữa sáng buffet ngon miệng và đa dạng.
+                    </p>
+                    <div class="manager-reply-box">
+                        <div class="fw-bold text-dark mb-1" style="font-size: 0.8rem;">Phản hồi từ Quản lý Grand Horizon Hotel</div>
+                        <div class="text-muted">Cảm ơn quý khách Mai Anh. Ban quản lý luôn nỗ lực nâng cao trải nghiệm ẩm thực và dịch vụ phòng.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CỘT PHẢI: KHUNG TÍNH TIỀN & ĐẶT PHÒNG NGAY -->
+        <div class="col-lg-4">
+            <form action="/booking/2/" method="GET" class="booking-widget-card">
+                <div class="widget-price-label">GIÁ MỖI ĐÊM</div>
+                <div class="d-flex align-items-baseline gap-1 mb-1">
+                    <span class="widget-price-main">1.200.000 VNĐ</span>
+                    <span class="text-muted small">/ đêm</span>
+                </div>
+                <div class="text-success small fw-semibold mb-3">
+                    &bull; Miễn phí hủy trước 72h
+                </div>
+
+                <!-- Ô chọn ngày & số khách -->
+                <div class="widget-input-group">
+                    <div class="row g-0 border-bottom">
+                        <div class="col-6 border-end widget-input-box">
+                            <label for="detail_check_in">NHẬN PHÒNG</label>
+                            <input type="date" name="check_in" id="detail_check_in" value="2026-11-09">
+                        </div>
+                        <div class="col-6 widget-input-box">
+                            <label for="detail_check_out">TRẢ PHÒNG</label>
+                            <input type="date" name="check_out" id="detail_check_out" value="2026-11-11">
+                        </div>
+                    </div>
+                    <div class="widget-input-box">
+                        <label for="detail_guests">SỐ KHÁCH</label>
+                        <select name="guests" id="detail_guests">
+                            <option value="2" selected>2 Người lớn, 0 Trẻ em</option>
+                            <option value="3">2 Người lớn, 1 Trẻ em</option>
+                            <option value="1">1 Người lớn, 0 Trẻ em</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Chi tiết tính tiền -->
+                <div class="d-flex justify-content-between small text-muted mb-2">
+                    <span id="nightCalcLabel">1.200.000 đ x 2 đêm</span>
+                    <span class="fw-semibold text-dark" id="roomSubtotalLabel">2.400.000 đ</span>
+                </div>
+                <div class="d-flex justify-content-between small text-muted mb-3">
+                    <span>Thuế VAT (10%)</span>
+                    <span class="fw-semibold text-dark" id="vatAmountLabel">+240.000 đ</span>
+                </div>
+
+                <hr style="border-color: #e5e7eb;">
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="fw-bold text-dark">Tổng tạm tính</span>
+                    <span class="fw-bolder fs-5" style="color: var(--primary-navy);" id="grandTotalLabel">2.640.000 đ</span>
+                </div>
+
+                <button type="submit" class="btn btn-navy w-100 py-2.5 rounded-2 fw-bold mb-2" style="padding: 12px;">
+                    ĐẶT PHÒNG NGAY
+                </button>
+
+                <div class="text-center text-muted mb-3" style="font-size: 0.74rem;">
+                    Bạn chưa bị trừ tiền ở bước này. Giữ phòng trong 10 phút
+                </div>
+
+                <div class="row g-2">
+                    <div class="col-6">
+                        <button type="button" class="btn-widget-sub" id="saveWishlistBtn">
+                            <i class="bi bi-heart me-1"></i> Lưu vào yêu thích
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn-widget-sub" onclick="navigator.clipboard.writeText(window.location.href); alert('Đã sao chép đường dẫn phòng!');">
+                            <i class="bi bi-share me-1"></i> Chia sẻ phòng
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Viết đánh giá phòng (UC-14) -->
+<div class="modal fade" id="writeReviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="" method="POST" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Đánh giá Phòng Deluxe King</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="review_rating" class="form-label fw-semibold small">Số điểm đánh giá (1 - 5 sao)</label>
+                    <select name="rating" id="review_rating" class="form-select" required>
+                        <option value="5" selected>5 sao - Tuyệt vời</option>
+                        <option value="4">4 sao - Rất tốt</option>
+                        <option value="3">3 sao - Bình thường</option>
+                        <option value="2">2 sao - Tệ</option>
+                        <option value="1">1 sao - Rất tệ</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label for="review_comment" class="form-label fw-semibold small">Bình luận của bạn (tối thiểu 10 ký tự)</label>
+                    <textarea name="comment" id="review_comment" rows="4" class="form-control" minlength="10" placeholder="Chia sẻ trải nghiệm thực tế của bạn về phòng..." required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-navy">Gửi đánh giá</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Xem tất cả ảnh -->
+<div class="modal fade" id="galleryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Hình ảnh Phòng Deluxe King (Hướng biển)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12"><img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=1200&q=80" class="w-100 rounded" alt="Phòng ngủ"></div>
+                    <div class="col-md-6"><img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80" class="w-100 rounded" alt="Phòng tắm"></div>
+                    <div class="col-md-6"><img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80" class="w-100 rounded" alt="Ban công"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Tự động tính lại tiền khi đổi ngày Nhận phòng / Trả phòng
+    const checkInInput = document.getElementById('detail_check_in');
+    const checkOutInput = document.getElementById('detail_check_out');
+    const pricePerNight = 1200000;
+
+    function updatePriceSummary() {
+        if (!checkInInput || !checkOutInput) return;
+        const d1 = new Date(checkInInput.value);
+        const d2 = new Date(checkOutInput.value);
+        let nights = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+        if (isNaN(nights) || nights < 1) nights = 1;
+
+        const subtotal = pricePerNight * nights;
+        const vat = Math.round(subtotal * 0.1);
+        const total = subtotal + vat;
+
+        document.getElementById('nightCalcLabel').textContent = `1.200.000 đ x ${nights} đêm`;
+        document.getElementById('roomSubtotalLabel').textContent = subtotal.toLocaleString('vi-VN') + ' đ';
+        document.getElementById('vatAmountLabel').textContent = '+' + vat.toLocaleString('vi-VN') + ' đ';
+        document.getElementById('grandTotalLabel').textContent = total.toLocaleString('vi-VN') + ' đ';
+    }
+
+    if (checkInInput && checkOutInput) {
+        checkInInput.addEventListener('change', updatePriceSummary);
+        checkOutInput.addEventListener('change', updatePriceSummary);
+    }
+
+    // Đổi trạng thái nút Lưu vào yêu thích
+    const wishlistBtn = document.getElementById('saveWishlistBtn');
+    if (wishlistBtn) {
+        wishlistBtn.addEventListener('click', function () {
+            this.innerHTML = '<i class="bi bi-heart-fill text-danger me-1"></i> Đã lưu yêu thích';
+        });
+    }
+</script>
+{% endblock %}

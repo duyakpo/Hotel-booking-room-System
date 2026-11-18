@@ -1,0 +1,562 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Danh sách phòng - Grand Horizon Hotel{% endblock %}
+{% block nav_rooms %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f9fafb;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb-bar {
+        padding: 18px 0 12px 0;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    .breadcrumb-bar a {
+        color: #6b7280;
+        text-decoration: none;
+    }
+    .breadcrumb-bar a:hover {
+        color: var(--primary-navy);
+    }
+
+    /* Khung Bộ lọc bên trái */
+    .filter-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 20px;
+    }
+    .filter-title {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #111827;
+    }
+    .filter-reset {
+        font-size: 0.85rem;
+        color: var(--primary-navy);
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+    }
+    .filter-reset:hover {
+        text-decoration: underline;
+    }
+    .filter-group-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #111827;
+        margin-bottom: 12px;
+    }
+    .filter-divider {
+        border-top: 1px solid #f3f4f6;
+        margin: 18px 0;
+    }
+    .form-check-input:checked {
+        background-color: var(--primary-navy);
+        border-color: var(--primary-navy);
+    }
+    .form-check-label {
+        font-size: 0.875rem;
+        color: #374151;
+        cursor: pointer;
+    }
+    .room-count-badge {
+        font-size: 0.8rem;
+        color: #9ca3af;
+    }
+
+    /* Thanh kéo khoảng giá */
+    .price-range-slider {
+        accent-color: var(--primary-navy);
+        cursor: pointer;
+    }
+    .price-range-text {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #374151;
+        margin-top: 6px;
+    }
+
+    /* Thẻ phòng ngang bên phải */
+    .room-card {
+        background: #ffffff;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all 0.2s ease;
+        margin-bottom: 18px;
+    }
+    /* Hiệu ứng viền xanh navy nổi bật giống thẻ Deluxe King trên Figma */
+    .room-card:hover {
+        border-color: var(--primary-navy);
+        box-shadow: 0 8px 24px rgba(22, 56, 130, 0.12);
+    }
+    .room-card-img {
+        width: 100%;
+        height: 195px;
+        object-fit: cover;
+    }
+    .room-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+    .room-meta {
+        font-size: 0.82rem;
+        color: #6b7280;
+        margin-bottom: 10px;
+    }
+    .room-amenities-icons {
+        display: flex;
+        gap: 12px;
+        color: #4b5563;
+        font-size: 0.95rem;
+        margin-bottom: 12px;
+    }
+    .free-cancel-tag {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #10b981;
+        display: inline-block;
+    }
+
+    /* Cột giá & nút bên phải thẻ phòng */
+    .room-price-col {
+        border-left: 1px solid #f3f4f6;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding: 16px 20px;
+    }
+    .rating-badge {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #111827;
+    }
+    .rating-badge i {
+        color: #f59e0b;
+    }
+    .rating-count {
+        font-weight: 400;
+        color: #6b7280;
+    }
+    .room-price {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--primary-navy);
+        line-height: 1.2;
+    }
+    .room-price-note {
+        font-size: 0.72rem;
+        color: #9ca3af;
+        margin-bottom: 12px;
+    }
+    .btn-outline-detail {
+        border: 1px solid #d1d5db;
+        color: #374151;
+        background: #ffffff;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-outline-detail:hover {
+        border-color: var(--primary-navy);
+        color: var(--primary-navy);
+    }
+    .btn-book-now {
+        background-color: var(--primary-navy);
+        color: #ffffff;
+        border: 1px solid var(--primary-navy);
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-book-now:hover {
+        background-color: var(--primary-navy-hover);
+        color: #ffffff;
+    }
+
+    /* Phân trang */
+    .custom-pagination .page-link {
+        color: #374151;
+        border: 1px solid #e5e7eb;
+        margin: 0 3px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .custom-pagination .page-item.active .page-link {
+        background-color: var(--primary-navy);
+        border-color: var(--primary-navy);
+        color: #ffffff;
+    }
+
+    @media (max-width: 767px) {
+        .room-price-col {
+            border-left: none;
+            border-top: 1px solid #f3f4f6;
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5">
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb-bar">
+        <a href="/">Trang chủ</a> <span class="mx-1">/</span> <span class="text-dark fw-medium">Danh sách phòng</span>
+    </div>
+
+    <div class="row g-4">
+        <!-- CỘT TRÁI: BỘ LỌC TÌM KIẾM (UC-01 Filter) -->
+        <div class="col-lg-3">
+            <form action="/rooms/" method="GET" id="roomFilterForm" class="filter-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="filter-title">Bộ lọc tìm kiếm</span>
+                    <a id="resetFilterBtn" class="filter-reset">Xóa tất cả</a>
+                </div>
+
+                <!-- Loại phòng -->
+                <div class="mb-3">
+                    <div class="filter-group-title">Loại phòng</div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="room_type" value="standard" id="typeStandard">
+                            <label class="form-check-label" for="typeStandard">Phòng Tiêu chuẩn</label>
+                        </div>
+                        <span class="room-count-badge">(8)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="room_type" value="deluxe" id="typeDeluxe" checked>
+                            <label class="form-check-label" for="typeDeluxe">Phòng Deluxe</label>
+                        </div>
+                        <span class="room-count-badge">(6)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="room_type" value="suite" id="typeSuite">
+                            <label class="form-check-label" for="typeSuite">Phòng Suite</label>
+                        </div>
+                        <span class="room-count-badge">(5)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="room_type" value="family" id="typeFamily">
+                            <label class="form-check-label" for="typeFamily">Phòng Gia đình</label>
+                        </div>
+                        <span class="room-count-badge">(4)</span>
+                    </div>
+                </div>
+
+                <div class="filter-divider"></div>
+
+                <!-- Khoảng giá -->
+                <div class="mb-3">
+                    <div class="filter-group-title">Khoảng giá</div>
+                    <input type="hidden" name="min_price" id="minPriceInput" value="500000">
+                    <input type="range" class="form-range price-range-slider" name="max_price" id="maxPriceRange" min="500000" max="3500000" step="100000" value="3500000">
+                    <div class="price-range-text" id="priceRangeLabel">
+                        500.000 đ — 3.500.000 đ
+                    </div>
+                </div>
+
+                <div class="filter-divider"></div>
+
+                <!-- Tiện ích phòng -->
+                <div>
+                    <div class="filter-group-title">Tiện ích phòng</div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="amenities" value="wifi" id="amWifi" checked>
+                        <label class="form-check-label" for="amWifi"><i class="bi bi-wifi me-1 text-muted"></i> WiFi miễn phí</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="amenities" value="bathtub" id="amBathtub">
+                        <label class="form-check-label" for="amBathtub"><i class="bi bi-droplet me-1 text-muted"></i> Bồn tắm</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="amenities" value="pool" id="amPool">
+                        <label class="form-check-label" for="amPool"><i class="bi bi-water me-1 text-muted"></i> Hồ bơi</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="amenities" value="parking" id="amParking">
+                        <label class="form-check-label" for="amParking"><i class="bi bi-p-square me-1 text-muted"></i> Bãi đỗ xe</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="amenities" value="seaview" id="amSeaView">
+                        <label class="form-check-label" for="amSeaView"><i class="bi bi-tsunami me-1 text-muted"></i> View hướng biển</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-navy w-100 mt-4 py-2 rounded-2 small">
+                    Áp dụng bộ lọc
+                </button>
+            </form>
+        </div>
+
+        <!-- CỘT PHẢI: DANH SÁCH PHÒNG -->
+        <div class="col-lg-9">
+            <!-- Thanh tiêu đề & Sắp xếp -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                <div class="fw-bold text-dark" style="font-size: 0.95rem;">
+                    Tìm thấy 5 phòng phù hợp
+                </div>
+                <div class="d-flex align-items-center gap-2 bg-white border rounded-2 px-3 py-1.5">
+                    <span class="text-muted small">Sắp xếp:</span>
+                    <select name="sort" class="border-0 bg-transparent small fw-semibold text-dark" style="outline: none; cursor: pointer;">
+                        <option value="price_asc" selected>Giá thấp đến cao</option>
+                        <option value="price_desc">Giá cao đến thấp</option>
+                        <option value="rating_desc">Đánh giá cao nhất</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- DANH SÁCH 5 THẺ PHÒNG -->
+            <!-- Phòng 1: Phòng Deluxe Garden View -->
+            <div class="room-card">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=700&q=80" class="room-card-img" alt="Phòng Deluxe Garden View">
+                    </div>
+                    <div class="col-md-4 p-3 d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="room-name">Phòng Deluxe Garden View</h5>
+                            <div class="room-meta">32m² &middot; Tối đa 2 khách</div>
+                            <div class="room-amenities-icons">
+                                <i class="bi bi-wifi" title="WiFi miễn phí"></i>
+                                <i class="bi bi-snow" title="Điều hòa"></i>
+                                <i class="bi bi-tv" title="Smart TV"></i>
+                                <i class="bi bi-cup-hot" title="Trà & Cà phê"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="free-cancel-tag">Miễn phí hủy trước 72h</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 room-price-col">
+                        <div class="rating-badge">
+                            <i class="bi bi-star-fill"></i> 4.5 <span class="rating-count">(32 đánh giá)</span>
+                        </div>
+                        <div class="text-md-end w-100 mt-3">
+                            <div class="room-price">1.050.000 đ</div>
+                            <div class="room-price-note">/ đêm (Đã bao gồm thuế)</div>
+                            <div class="d-flex justify-content-md-end gap-2">
+                                <a href="/rooms/1/" class="btn-outline-detail">Xem chi tiết</a>
+                                <a href="/booking/1/" class="btn-book-now">Đặt ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phòng 2: Phòng Deluxe King -->
+            <div class="room-card">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=700&q=80" class="room-card-img" alt="Phòng Deluxe King">
+                    </div>
+                    <div class="col-md-4 p-3 d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="room-name">Phòng Deluxe King</h5>
+                            <div class="room-meta">35m² &middot; Tối đa 2 khách</div>
+                            <div class="room-amenities-icons">
+                                <i class="bi bi-wifi" title="WiFi miễn phí"></i>
+                                <i class="bi bi-snow" title="Điều hòa"></i>
+                                <i class="bi bi-tv" title="Smart TV"></i>
+                                <i class="bi bi-cup-hot" title="Trà & Cà phê"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="free-cancel-tag">Miễn phí hủy trước 72h</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 room-price-col">
+                        <div class="rating-badge">
+                            <i class="bi bi-star-fill"></i> 4.8 <span class="rating-count">(58 đánh giá)</span>
+                        </div>
+                        <div class="text-md-end w-100 mt-3">
+                            <div class="room-price">1.200.000 đ</div>
+                            <div class="room-price-note">/ đêm (Đã bao gồm thuế)</div>
+                            <div class="d-flex justify-content-md-end gap-2">
+                                <a href="/rooms/2/" class="btn-outline-detail">Xem chi tiết</a>
+                                <a href="/booking/2/" class="btn-book-now">Đặt ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phòng 3: Phòng Deluxe Twin -->
+            <div class="room-card">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="https://images.unsplash.com/photo-1595576508898-0ad5c879a061?auto=format&fit=crop&w=700&q=80" class="room-card-img" alt="Phòng Deluxe Twin">
+                    </div>
+                    <div class="col-md-4 p-3 d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="room-name">Phòng Deluxe Twin</h5>
+                            <div class="room-meta">35m² &middot; Tối đa 2 khách</div>
+                            <div class="room-amenities-icons">
+                                <i class="bi bi-wifi" title="WiFi miễn phí"></i>
+                                <i class="bi bi-snow" title="Điều hòa"></i>
+                                <i class="bi bi-tv" title="Smart TV"></i>
+                                <i class="bi bi-cup-hot" title="Trà & Cà phê"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="free-cancel-tag">Miễn phí hủy trước 72h</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 room-price-col">
+                        <div class="rating-badge">
+                            <i class="bi bi-star-fill"></i> 4.7 <span class="rating-count">(54 đánh giá)</span>
+                        </div>
+                        <div class="text-md-end w-100 mt-3">
+                            <div class="room-price">1.350.000 đ</div>
+                            <div class="room-price-note">/ đêm (Đã bao gồm thuế)</div>
+                            <div class="d-flex justify-content-md-end gap-2">
+                                <a href="/rooms/3/" class="btn-outline-detail">Xem chi tiết</a>
+                                <a href="/booking/3/" class="btn-book-now">Đặt ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phòng 4: Phòng Deluxe Balcony -->
+            <div class="room-card">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=700&q=80" class="room-card-img" alt="Phòng Deluxe Balcony">
+                    </div>
+                    <div class="col-md-4 p-3 d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="room-name">Phòng Deluxe Balcony</h5>
+                            <div class="room-meta">40m² &middot; Tối đa 3 khách</div>
+                            <div class="room-amenities-icons">
+                                <i class="bi bi-wifi" title="WiFi miễn phí"></i>
+                                <i class="bi bi-snow" title="Điều hòa"></i>
+                                <i class="bi bi-tv" title="Smart TV"></i>
+                                <i class="bi bi-cup-hot" title="Trà & Cà phê"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="free-cancel-tag">Miễn phí hủy trước 72h</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 room-price-col">
+                        <div class="rating-badge">
+                            <i class="bi bi-star-fill"></i> 4.9 <span class="rating-count">(47 đánh giá)</span>
+                        </div>
+                        <div class="text-md-end w-100 mt-3">
+                            <div class="room-price">1.500.000 đ</div>
+                            <div class="room-price-note">/ đêm (Đã bao gồm thuế)</div>
+                            <div class="d-flex justify-content-md-end gap-2">
+                                <a href="/rooms/4/" class="btn-outline-detail">Xem chi tiết</a>
+                                <a href="/booking/4/" class="btn-book-now">Đặt ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phòng 5: Phòng Deluxe Panorama -->
+            <div class="room-card">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=700&q=80" class="room-card-img" alt="Phòng Deluxe Panorama">
+                    </div>
+                    <div class="col-md-4 p-3 d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="room-name">Phòng Deluxe Panorama</h5>
+                            <div class="room-meta">42m² &middot; Tối đa 3 khách</div>
+                            <div class="room-amenities-icons">
+                                <i class="bi bi-wifi" title="WiFi miễn phí"></i>
+                                <i class="bi bi-snow" title="Điều hòa"></i>
+                                <i class="bi bi-tv" title="Smart TV"></i>
+                                <i class="bi bi-cup-hot" title="Trà & Cà phê"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="free-cancel-tag">Miễn phí hủy trước 72h</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 room-price-col">
+                        <div class="rating-badge">
+                            <i class="bi bi-star-fill"></i> 4.8 <span class="rating-count">(70 đánh giá)</span>
+                        </div>
+                        <div class="text-md-end w-100 mt-3">
+                            <div class="room-price">1.650.000 đ</div>
+                            <div class="room-price-note">/ đêm (Đã bao gồm thuế)</div>
+                            <div class="d-flex justify-content-md-end gap-2">
+                                <a href="/rooms/5/" class="btn-outline-detail">Xem chi tiết</a>
+                                <a href="/booking/5/" class="btn-book-now">Đặt ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHÂN TRANG -->
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center custom-pagination">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1"><i class="bi bi-chevron-left"></i></a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="?page=1">1</a></li>
+                    <li class="page-item"><a class="page-link" href="?page=2">2</a></li>
+                    <li class="page-item"><a class="page-link" href="?page=3">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=2"><i class="bi bi-chevron-right"></i></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Cập nhật số tiền hiển thị khi kéo thanh trượt khoảng giá
+    const maxPriceRange = document.getElementById('maxPriceRange');
+    const priceRangeLabel = document.getElementById('priceRangeLabel');
+    const resetFilterBtn = document.getElementById('resetFilterBtn');
+    const roomFilterForm = document.getElementById('roomFilterForm');
+
+    if (maxPriceRange && priceRangeLabel) {
+        maxPriceRange.addEventListener('input', function () {
+            const formattedMax = Number(this.value).toLocaleString('vi-VN');
+            priceRangeLabel.textContent = `500.000 đ — ${formattedMax} đ`;
+        });
+    }
+
+    // Nút Xóa tất cả bộ lọc
+    if (resetFilterBtn && roomFilterForm) {
+        resetFilterBtn.addEventListener('click', function () {
+            roomFilterForm.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            maxPriceRange.value = 3500000;
+            priceRangeLabel.textContent = '500.000 đ — 3.500.000 đ';
+        });
+    }
+</script>
+{% endblock %}
